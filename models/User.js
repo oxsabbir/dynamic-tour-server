@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema(
     },
     userName: {
       type: String,
+      require: [true, "A unique username is require"],
       unique: true,
       max: [30, "Cannot have more then 40 character for username"],
       min: [3, "Cannout have lesser then 3 character for username"],
@@ -24,8 +25,8 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       require: [true, "Please provide an email address"],
+      unique: true,
       lowercase: true,
-      validate: [validator.isEmail, "Please provide valid email address"],
     },
     profileImage: String,
 
@@ -36,10 +37,12 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
+      require: [true, "A password is require to create an account"],
       min: [6, "A password require 6 or more character"],
     },
     confirmPassword: {
       type: String,
+      require: [true, "Please confirm the password"],
       min: [6, "A password require 6 or more character"],
       validate: {
         validator: function (el) {
