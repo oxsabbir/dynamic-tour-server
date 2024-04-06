@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
-const tourSchema = new mongoose.Schema(
+const reviewSchema = new mongoose.Schema(
   {},
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-const tourModel = mongoose.model("Tour", tourSchema);
+const reviewModel = mongoose.model("Review", reviewSchema);
 
-module.exports = tourModel;
+module.exports = reviewModel;
