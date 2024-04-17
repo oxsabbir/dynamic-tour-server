@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const userRouter = require("./routes/userRouter");
+const authRouter = require("./routes/authRouter");
 
 // getting the http body data, Body parser
 app.use(express.json());
@@ -8,6 +9,7 @@ app.use(express.json());
 // sending response for undefined route
 
 // Defining required routes
+app.use("/api/v1/", authRouter);
 app.use("/api/v1/user", userRouter);
 
 app.use("*", (req, res, next) => {
@@ -27,10 +29,10 @@ app.use("/", (req, res, next) => {
 // global error handling middleware
 
 app.use((err, req, res, next) => {
-  console.log("error from global");
+  console.log("error from global -", err);
   res.status(err.statusCode || 403).json({
     status: "error",
-    message: err.message,
+    message: err,
   });
 });
 

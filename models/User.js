@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
   {
@@ -68,6 +69,17 @@ const userSchema = new mongoose.Schema(
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+// hashing password before saving using document middleware
+userSchema.pre("save", async function (next) {
+  console.log();
+  // checking if the password has been modified before
+  if (!this.isModified()) return next();
+
+  this.password = await bcrypt.hash(this.password, 12);
+  this.confirmPassword = undefined;
+  next();
+});
 
 const userModel = mongoose.model("User", userSchema);
 

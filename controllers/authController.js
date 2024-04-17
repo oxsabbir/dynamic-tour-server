@@ -1,5 +1,14 @@
 const User = require("../models/User");
 const catchAsync = require("../utils/catchAsync");
+const jwt = require("jsonwebtoken");
+
+// generate jsonwebtoken
+
+const generateToken = function (userId) {
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
 
 // Sign up - Create new account
 exports.signUp = catchAsync(async function (req, res, next) {
@@ -13,7 +22,7 @@ exports.signUp = catchAsync(async function (req, res, next) {
   }
   // check if user already exist
   const userExist = await User.findOne({ email: req.body.email });
-  if (userExist) next("User already exist using this email");
+  if (userExist) return next("User already exist using this email");
 
   // this things handled from the user model
   // create encrypts password
@@ -21,11 +30,14 @@ exports.signUp = catchAsync(async function (req, res, next) {
 
   // create the user
   const newUser = await User.create(req.body);
+  if (!newUser) return next("Something went wrong while creating user");
+  const token = generateToken();
 
   res.status(200).json({
     status: "success",
     message: "User created successfully",
     data: {
+      token,
       user: newUser,
     },
   });
