@@ -49,10 +49,27 @@ exports.signUp = catchAsync(async function (req, res, next) {
 
 exports.login = catchAsync(async function (req, res, next) {
   // validate user input
+  if (!req.body.email) return next("Please provide email or username");
+  if (!req.body.password) return next("Please provide a password");
   // check if that user exist in the database
+  const userData = await User.findOne({ email: req.body.email });
+  if (!userData) return next("No user found with provided information");
   // compare the password using instance method of the document
+  const isCorrect =
+    userData &&
+    (await userData.checkPassword(userData.password, req.body.password));
+  if (!isCorrect)
+    return next("Please provide a valid email and password combination");
   // generate JSONWEBTOKEN
-  // add the user data  to req object req.user = data
+  const token = generateToken(userData._id);
+  // add the userData data  to req object req.userData = data
+  res.status(200).json({
+    status: "success",
+    data: {
+      token,
+      userData,
+    },
+  });
   // send response
 });
 

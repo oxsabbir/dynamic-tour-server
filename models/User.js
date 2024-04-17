@@ -70,6 +70,16 @@ const userSchema = new mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+// using the instance method to check the password if it's correct or not
+userSchema.methods.checkPassword = async function (
+  storedPassword,
+  providedPassword
+) {
+  console.log(storedPassword);
+  const isCorrect = await bcrypt.compare(providedPassword, storedPassword);
+  return isCorrect;
+};
+
 // hashing password before saving using document middleware
 userSchema.pre("save", async function (next) {
   console.log();
