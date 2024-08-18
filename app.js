@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const userRouter = require("./routes/userRouter");
 const authRouter = require("./routes/authRouter");
+const tourRouter = require("./routes/tourRouter");
 
 // getting the http body data, Body parser
 app.use(express.json());
@@ -11,6 +12,7 @@ app.use(express.json());
 // Defining required routes
 app.use("/api/v1/", authRouter);
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/tour", tourRouter);
 
 app.use("*", (req, res, next) => {
   res.status(404).json({

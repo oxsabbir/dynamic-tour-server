@@ -12,3 +12,7 @@ exports.getAllUser = catchAsync(async function (req, res, next) {
     },
   });
 });
+
+exports.updateUser = catchAsync(async function (req, res, next) {});
+
+exports.updateProfile = catchAsync(async function (req, res, next) {});

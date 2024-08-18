@@ -13,6 +13,8 @@ exports.getAllTours = catchAsync(async function (req, res, next) {
   });
 });
 
+exports.addTour = catchAsync(async function (req, res, next) {});
+
 exports.getTour = catchAsync(async function (req, res, next) {
   let id;
   if (req.params.id) {
@@ -20,6 +22,20 @@ exports.getTour = catchAsync(async function (req, res, next) {
   }
   const tour = await Tour.findOne({ _id: id });
   res.status(200).json({
+    status: "success",
+    data: {
+      tour,
+    },
+  });
+});
+
+exports.deleteTour = catchAsync(async function (req, res, next) {
+  let id = req.params?.id;
+  if (!id) return next("No tour found to delete");
+
+  const tour = await Tour.findOneAndDelete({ _id: id });
+
+  res.status(204).json({
     status: "success",
     data: {
       tour,
