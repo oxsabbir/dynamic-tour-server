@@ -49,10 +49,17 @@ exports.signUp = catchAsync(async function (req, res, next) {
 
 exports.login = catchAsync(async function (req, res, next) {
   // validate user input
-  if (!req.body.email) return next("Please provide email or username");
+  console.log(req.body);
+  if (!req.body.emailOrUsername)
+    return next("Please provide email or username");
   if (!req.body.password) return next("Please provide a password");
   // check if that user exist in the database
-  const userData = await User.findOne({ email: req.body.email });
+  const userData = await User.findOne({
+    $or: [
+      { email: req.body.emailOrUsername },
+      { userName: req.body.emailOrUsername },
+    ],
+  });
   if (!userData) return next("No user found with provided information");
   // compare the password using instance method of the document
   const isCorrect =
