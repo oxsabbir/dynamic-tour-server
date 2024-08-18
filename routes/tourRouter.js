@@ -7,4 +7,4 @@ router.get("/:id", tourController.getTour);
 router.post("/:id", tourController.deleteTour);
 router.post("/", tourController.addTour);
 
-export default router;
+module.exports = router;
