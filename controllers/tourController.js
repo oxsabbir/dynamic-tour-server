@@ -1,5 +1,4 @@
 const Tour = require("../models/Tour");
-
 const catchAsync = require("../utils/catchAsync");
 
 exports.getAllTours = catchAsync(async function (req, res, next) {
@@ -20,7 +19,15 @@ exports.getTour = catchAsync(async function (req, res, next) {
   if (req.params.id) {
     id = req.params.id;
   }
-  const tour = await Tour.findOne({ _id: id });
+  const tour = await Tour.findById(id);
+
+  if (!tour) {
+    res.status(404).json({
+      status: "fail",
+      message: "No tour found !",
+    });
+  }
+
   res.status(200).json({
     status: "success",
     data: {
@@ -30,6 +37,7 @@ exports.getTour = catchAsync(async function (req, res, next) {
 });
 
 exports.deleteTour = catchAsync(async function (req, res, next) {
+  console.log("Hi");
   let id = req.params?.id;
   if (!id) return next("No tour found to delete");
 
