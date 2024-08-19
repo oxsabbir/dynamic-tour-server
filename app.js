@@ -1,5 +1,7 @@
 const express = require("express");
 const app = express();
+const cookieParser = require("cookie-parser");
+
 const userRouter = require("./routes/userRouter");
 const authRouter = require("./routes/authRouter");
 const tourRouter = require("./routes/tourRouter");
@@ -7,12 +9,15 @@ const tourRouter = require("./routes/tourRouter");
 // getting the http body data, Body parser
 app.use(express.json());
 
-// sending response for undefined route
+// setting cookie parser
+app.use(cookieParser());
 
 // Defining required routes
 app.use("/api/v1/", authRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/tour", tourRouter);
+
+// sending response for undefined route
 
 app.use("*", (req, res, next) => {
   res.status(404).json({
