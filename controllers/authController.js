@@ -1,8 +1,11 @@
 const User = require("../models/User");
 const catchAsync = require("../utils/catchAsync");
 const jwt = require("jsonwebtoken");
+const upload = require("../utils/uploadFiles");
 
 // generate jsonwebtoken
+
+// multer setup
 
 const generateToken = function (userId) {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
@@ -96,3 +99,16 @@ exports.routeProtect = catchAsync(async function (req, res, next) {
 });
 
 // Role base access - Ristrict
+
+exports.uploadSingle = upload.array("profileImage");
+
+exports.updateProfile = catchAsync(async function (req, res, next) {
+  console.log(req.body);
+  console.log(req.file);
+  console.log(req.files);
+
+  // now we got the file
+
+  // need cloudinary to store the file
+  res.send("file uploaded");
+});
