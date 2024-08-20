@@ -11,4 +11,6 @@ router.post(
   authController.updateProfile
 );
 
+router.get("/getMe", authController.routeProtect, authController.getMe);
+
 module.exports = router;

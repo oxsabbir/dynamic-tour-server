@@ -161,3 +161,19 @@ exports.updateProfile = catchAsync(async function (req, res, next) {
   // need cloudinary to store the file
   res.send("file uploaded");
 });
+
+exports.getMe = catchAsync(async function (req, res, next) {
+  console.log(req.user);
+  let id;
+  id = req.user?.id;
+
+  const user = await User.findById(id).select("-password -__v");
+  if (!user) return next(new AppError("No user found ", 404));
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      user,
+    },
+  });
+});
