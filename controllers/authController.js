@@ -138,6 +138,7 @@ exports.routeProtect = catchAsync(async function (req, res, next) {
 // Role base access - Ristrict
 exports.authorise = function (...roles) {
   return function (req, res, next) {
+    console.log(req.userRole);
     if (!roles.includes(req.userRole)) {
       return next(
         new AppError("You are not authorised to perform this action.", 403)

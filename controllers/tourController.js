@@ -1,5 +1,7 @@
 const Tour = require("../models/Tour");
+const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
+const upload = require("../utils/uploadFiles");
 
 exports.getAllTours = catchAsync(async function (req, res, next) {
   const allTour = await Tour.find();
@@ -12,7 +14,65 @@ exports.getAllTours = catchAsync(async function (req, res, next) {
   });
 });
 
-exports.addTour = catchAsync(async function (req, res, next) {});
+// upload middleware
+exports.uploadFields = upload.any();
+
+exports.addTour = catchAsync(async function (req, res, next) {
+  // get the body data and filter it
+  let tourData;
+  tourData = req.body;
+
+  // console.log(tourData);
+  if (req.files.length < 1)
+    return next(new AppError("No image file found", 404));
+
+  req.files.forEach((item, i) => {
+    if (item.fieldname === "images") {
+      // console.log("images --", item);
+      // upload the image and send the link
+      tourData["images"] = tourData.images
+        ? [...tourData.images, item]
+        : [item];
+    }
+
+    if (item.fieldname === "coverImage") {
+      // console.log("coverImage --", item);
+      tourData["coverImage"] = item;
+      // upload the image and send the link
+    }
+    if (item.fieldname === "startLocation[image]") {
+      // console.log("startLocation", item);
+
+      tourData.startLocation["image"] = tourData.startLocation.image
+        ? [...tourData.startLocation.image, item]
+        : [item];
+    }
+    if (item.fieldname.startsWith("locations")) {
+      // console.log("location", item);
+      // get the required index to the image link
+      let locationIndex = +item.fieldname.slice(10, 11);
+      tourData.locations[locationIndex]["image"] = tourData.locations[
+        locationIndex
+      ].image
+        ? [...tourData.locations[locationIndex].image, item]
+        : [item];
+    }
+  });
+
+  console.log(tourData);
+  // get the cover image and upload the cover image
+
+  // get all the feature image and upload it
+
+  // get startlocation image
+
+  // get all the location image
+
+  // send the response
+  res.status(201).json({
+    status: "success",
+  });
+});
 
 exports.getTour = catchAsync(async function (req, res, next) {
   let id;

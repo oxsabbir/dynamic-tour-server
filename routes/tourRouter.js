@@ -7,12 +7,25 @@ const authController = require("../controllers/authController");
 router
   .route("/")
   .get(tourController.getAllTours)
-  .post(authController.authorise("admin"), tourController.addTour);
+  .post(
+    authController.routeProtect,
+    authController.authorise("admin"),
+    tourController.uploadFields,
+    tourController.addTour
+  );
 
 router
   .route("/:tourId")
   .get(tourController.getTour)
-  .put(authController.authorise("admin"), tourController.updateTour)
-  .delete(authController.authorise("admin"), tourController.deleteTour);
+  .put(
+    authController.routeProtect,
+    authController.authorise("admin"),
+    tourController.updateTour
+  )
+  .delete(
+    authController.routeProtect,
+    authController.authorise("admin"),
+    tourController.deleteTour
+  );
 
 module.exports = router;
