@@ -23,17 +23,19 @@ const sendCookie = function (res, name, val, options) {
   }
   res.cookie(name, val, cookieOption);
 };
+exports.uploadProfileImage = upload.single("profileImage");
 
 // Sign up - Create new account
 exports.signUp = catchAsync(async function (req, res, next) {
   // validate the requestBody remove the role if user send it
+  let userData = req.body;
+
   if (req.body.role) {
-    req.body.role = undefined;
+    userData.role = undefined;
   }
+  console.log(userData, req.file);
   // if user try to put the createdAt property
-  if (req.body.createdAt) {
-    req.body.createdAt = Date.now();
-  }
+
   // check if user already exist
   const userExist = await User.findOne({ email: req.body.email });
   if (userExist) return next("User already exist using this email");
@@ -42,8 +44,12 @@ exports.signUp = catchAsync(async function (req, res, next) {
   // create encrypts password
   // save password in the database
 
+  // upload profile image
+
   // create the user
-  const newUser = await User.create(req.body);
+  return next();
+
+  const newUser = await User.create(userData);
   if (!newUser) return next("Something went wrong while creating user");
   const token = generateToken();
 
@@ -64,7 +70,6 @@ exports.signUp = catchAsync(async function (req, res, next) {
 
 exports.login = catchAsync(async function (req, res, next) {
   // validate user input
-  console.log(req.body);
   if (!req.body.emailOrUsername)
     return next("Please provide email or username");
   if (!req.body.password) return next("Please provide a password");
@@ -92,7 +97,6 @@ exports.login = catchAsync(async function (req, res, next) {
     status: "success",
     data: {
       token,
-      userData,
     },
   });
   // send response
@@ -163,10 +167,8 @@ exports.updateProfile = catchAsync(async function (req, res, next) {
 });
 
 exports.getMe = catchAsync(async function (req, res, next) {
-  console.log(req.user);
   let id;
   id = req.user?.id;
-
   const user = await User.findById(id).select("-password -__v");
   if (!user) return next(new AppError("No user found ", 404));
 

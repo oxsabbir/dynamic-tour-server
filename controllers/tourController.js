@@ -30,6 +30,7 @@ exports.addTour = catchAsync(async function (req, res, next) {
     if (item.fieldname === "images") {
       // console.log("images --", item);
       // upload the image and send the link
+
       tourData["images"] = tourData.images
         ? [...tourData.images, item]
         : [item];
