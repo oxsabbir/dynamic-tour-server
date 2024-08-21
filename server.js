@@ -1,10 +1,19 @@
 const app = require("./app");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
-const cloudinary = require("cloudinary");
+const cloudinary = require("cloudinary").v2;
 
 // configuring environtment variable
 dotenv.config({ path: "./config.env" });
+
+// configuring cloudinary
+
+cloudinary.config({
+  secure: true,
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // handling upcaughtException
 process.on("uncaughtException", (err) => {
@@ -19,14 +28,6 @@ const DATABASE_PASSWORD = process.env.PASSWORD;
 mongoose
   .connect(DATABASE_URL.replace("<PASSWORD>", DATABASE_PASSWORD))
   .then(() => console.log("DATABASE CONNECTED SUCCESSFULLY"));
-
-// configuring cloudinary
-cloudinary.config({
-  secure: true,
-  cloud_name: process.env.CLOUIDNARY_NAME,
-  api_key: process.env.CLOUIDNARY_API_KEY,
-  api_secret: process.env.CLOUIDNARY_API_SECRET, // Click 'View API Keys' above to copy your API secret
-});
 
 // starting server
 const server = app.listen(process.env.PORT, "127.0.0.1", () => {

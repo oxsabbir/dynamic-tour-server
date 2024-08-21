@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const upload = require("../utils/uploadFiles");
 const AppError = require("../utils/AppError");
 
+const cloudinary = require("cloudinary").v2;
+
 // generate jsonwebtoken
 
 const generateToken = function (userId) {
@@ -153,16 +155,56 @@ exports.authorise = function (...roles) {
   };
 };
 
-exports.uploadSingle = upload.array("profileImage");
+exports.uploadSingle = upload.single("profileImage");
 
 exports.updateProfile = catchAsync(async function (req, res, next) {
-  console.log(req.body);
-  console.log(req.file);
-  console.log(req.files);
+  // filter incoming data
+  const filterinput = function (currentData, ...disableProps) {
+    const updatedData = {};
 
-  // now we got the file
+    // getting the key of the object
+    const dataEntries = Object.keys(currentData);
 
-  // need cloudinary to store the file
+    // if tries to change the password
+    if (dataEntries.includes("password"))
+      return next(new AppError("You cannot change  password here.", 400));
+    // if tries to change the username
+    if (dataEntries.includes("userName"))
+      return next(new AppError("You cannot change  your username.", 400));
+
+    dataEntries.map((item) => {
+      if (!disableProps.includes(item)) {
+        updatedData[item] = currentData[item];
+      }
+    });
+    // returning the filter data
+    return updatedData;
+  };
+
+  const updatedData = filterinput(
+    req.body,
+    "role",
+    "userName",
+    "isActive",
+    "password",
+    "createdAt"
+  );
+
+  console.log(updatedData);
+  // getting the image file
+  const imageBuffer = req.file?.buffer;
+
+  if (imageBuffer) {
+    const uploadResult = cloudinary.uploader
+      .upload_stream({
+        folder: "profile",
+      })
+      .end(imageBuffer);
+
+    console.log(uploadResult);
+  }
+  // uploading the image and adding the the link
+
   res.send("file uploaded");
 });
 
