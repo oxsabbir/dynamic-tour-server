@@ -3,12 +3,9 @@ const authController = require("../controllers/authController");
 
 const router = express.Router();
 
-router.post(
-  "/signup",
-  authController.uploadProfileImage,
-  authController.signUp
-);
+router.post("/signup", authController.uploadSingle, authController.signUp);
 router.post("/login", authController.login);
+
 router.post(
   "/updateMe",
   authController.routeProtect,

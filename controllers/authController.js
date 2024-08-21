@@ -26,8 +26,7 @@ const sendCookie = function (res, name, val, options) {
   res.cookie(name, val, cookieOption);
 };
 
-exports.uploadProfileImage = upload.single("profileImage");
-
+exports.uploadSingle = upload.single("profileImage");
 // Sign up - Create new account
 exports.signUp = catchAsync(async function (req, res, next) {
   // validate the requestBody remove the role if user send it
@@ -36,7 +35,6 @@ exports.signUp = catchAsync(async function (req, res, next) {
   if (req.body.role) {
     userData.role = undefined;
   }
-  console.log(userData, req.file);
   // if user try to put the createdAt property
 
   // check if user already exist
@@ -47,16 +45,32 @@ exports.signUp = catchAsync(async function (req, res, next) {
   // create encrypts password
   // save password in the database
 
+  // create the user document only
+  const userDocument = new User(userData);
+
   // upload profile image
 
-  // create the user
-  return next();
+  const imageBuffer = req.file?.buffer;
+  if (imageBuffer) {
+    const result = await uploadCloudinary(
+      imageBuffer,
+      `profile/${userDocument.id}`
+    );
+    userDocument["profileImage"] = result.secure_url;
+  }
 
-  const newUser = await User.create(userData);
+  // creating new user to database
+  const newUser = await userDocument.save({ validateBeforeSave: true });
+
   if (!newUser) return next("Something went wrong while creating user");
+  newUser.password = undefined;
+
+  console.log(newUser);
+
   const token = generateToken();
 
   sendCookie(res, "jwt", token);
+
   res.status(200).json({
     status: "success",
     message: "User created successfully",
@@ -96,6 +110,7 @@ exports.login = catchAsync(async function (req, res, next) {
 
   // send response
   sendCookie(res, "jwt", token);
+
   res.status(200).json({
     status: "success",
     data: {
@@ -155,8 +170,6 @@ exports.authorise = function (...roles) {
   };
 };
 
-exports.uploadSingle = upload.single("profileImage");
-
 exports.updateProfile = catchAsync(async function (req, res, next) {
   // filter incoming data
   const filterinput = function (currentData, ...disableProps) {
@@ -193,6 +206,8 @@ exports.updateProfile = catchAsync(async function (req, res, next) {
   // getting the image file
   const imageBuffer = req.file?.buffer;
 
+  // uploading the image and adding the the link
+
   if (imageBuffer) {
     const result = await uploadCloudinary(
       imageBuffer,
@@ -201,17 +216,12 @@ exports.updateProfile = catchAsync(async function (req, res, next) {
     updatedData["profileImage"] = result.secure_url;
   }
 
-  // uploading the image and adding the the link
-
   // change the data in the database
-  console.log(updatedData);
 
   const userData = await User.findByIdAndUpdate(
     req.user?.id,
     updatedData
   ).select("-password -role -isActive");
-
-  console.log(userData);
 
   if (!userData)
     return next(
