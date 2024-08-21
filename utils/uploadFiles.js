@@ -1,6 +1,7 @@
 const multer = require("multer");
 const path = require("path");
-
+const { escape } = require("querystring");
+const cloudinary = require("cloudinary").v2;
 const memoryStorage = multer.memoryStorage();
 
 const diskStorage = multer.diskStorage({
@@ -32,4 +33,17 @@ const upload = multer({
   limits: { fileSize: 1024 * 1024 * 10 }, // limit the file to 10mb
 });
 
-module.exports = upload;
+exports.upload = upload;
+
+exports.uploadCloudinary = function (buffer, folder) {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader
+      .upload_stream({ folder }, (error, result) => {
+        if (error) {
+          return reject(error);
+        }
+        resolve(result);
+      })
+      .end(buffer);
+  });
+};

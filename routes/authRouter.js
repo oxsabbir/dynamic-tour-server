@@ -11,6 +11,7 @@ router.post(
 router.post("/login", authController.login);
 router.post(
   "/updateMe",
+  authController.routeProtect,
   authController.uploadSingle,
   authController.updateProfile
 );

@@ -1,10 +1,10 @@
 const User = require("../models/User");
 const catchAsync = require("../utils/catchAsync");
 const jwt = require("jsonwebtoken");
-const upload = require("../utils/uploadFiles");
+const { upload } = require("../utils/uploadFiles");
 const AppError = require("../utils/AppError");
 
-const cloudinary = require("cloudinary").v2;
+const { uploadCloudinary } = require("../utils/uploadFiles");
 
 // generate jsonwebtoken
 
@@ -25,6 +25,7 @@ const sendCookie = function (res, name, val, options) {
   }
   res.cookie(name, val, cookieOption);
 };
+
 exports.uploadProfileImage = upload.single("profileImage");
 
 // Sign up - Create new account
@@ -111,8 +112,7 @@ exports.login = catchAsync(async function (req, res, next) {
 exports.routeProtect = catchAsync(async function (req, res, next) {
   // check if the JWT is on the request Header or not
   let token;
-
-  if (req.headers.authorization.startsWith("Bearer")) {
+  if (req.headers.authorization?.startsWith("Bearer")) {
     token = req.headers.authorization.split(" ")[1];
     // check if it's on the cookie
   } else if (req.cookies.jwt) {
@@ -181,7 +181,7 @@ exports.updateProfile = catchAsync(async function (req, res, next) {
     return updatedData;
   };
 
-  const updatedData = filterinput(
+  let updatedData = filterinput(
     req.body,
     "role",
     "userName",
@@ -190,22 +190,41 @@ exports.updateProfile = catchAsync(async function (req, res, next) {
     "createdAt"
   );
 
-  console.log(updatedData);
   // getting the image file
   const imageBuffer = req.file?.buffer;
 
   if (imageBuffer) {
-    const uploadResult = cloudinary.uploader
-      .upload_stream({
-        folder: "profile",
-      })
-      .end(imageBuffer);
-
-    console.log(uploadResult);
+    const result = await uploadCloudinary(
+      imageBuffer,
+      `profile/${req.user?.id}`
+    );
+    updatedData["profileImage"] = result.secure_url;
   }
+
   // uploading the image and adding the the link
 
-  res.send("file uploaded");
+  // change the data in the database
+  console.log(updatedData);
+
+  const userData = await User.findByIdAndUpdate(
+    req.user?.id,
+    updatedData
+  ).select("-password -role -isActive");
+
+  console.log(userData);
+
+  if (!userData)
+    return next(
+      new AppError("Something went wrong while updating profile", 400)
+    );
+
+  res.status(200).json({
+    status: "success",
+    message: "Profile updated",
+    data: {
+      userData,
+    },
+  });
 });
 
 exports.getMe = catchAsync(async function (req, res, next) {

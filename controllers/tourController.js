@@ -1,7 +1,7 @@
 const Tour = require("../models/Tour");
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
-const upload = require("../utils/uploadFiles");
+const { upload } = require("../utils/uploadFiles");
 
 exports.getAllTours = catchAsync(async function (req, res, next) {
   const allTour = await Tour.find();
