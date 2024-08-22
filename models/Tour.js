@@ -24,9 +24,8 @@ const tourSchema = new mongoose.Schema(
     },
     discountPrice: Number,
 
-    coverImage: {
-      type: String,
-    },
+    coverImage: String,
+
     images: [String],
 
     totalRating: Number,

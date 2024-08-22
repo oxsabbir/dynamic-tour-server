@@ -1,7 +1,7 @@
 const Tour = require("../models/Tour");
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
-const { upload } = require("../utils/uploadFiles");
+const { upload, uploadCloudinary } = require("../utils/uploadFiles");
 
 exports.getAllTours = catchAsync(async function (req, res, next) {
   const allTour = await Tour.find();
@@ -22,56 +22,93 @@ exports.addTour = catchAsync(async function (req, res, next) {
   let tourData;
   tourData = req.body;
 
-  // console.log(tourData);
   if (req.files.length < 1)
     return next(new AppError("No image file found", 404));
 
-  req.files.forEach((item, i) => {
-    if (item.fieldname === "images") {
-      // console.log("images --", item);
-      // upload the image and send the link
+  // creating newTour doucment will save it later down
+  let newTour = new Tour(tourData);
 
-      tourData["images"] = tourData.images
-        ? [...tourData.images, item]
-        : [item];
-    }
+  const uploadByFolder = async function (buffer, folder, fieldName) {
+    // upload the file one after another
+    const result = await uploadCloudinary(buffer, folder);
 
-    if (item.fieldname === "coverImage") {
-      // console.log("coverImage --", item);
-      tourData["coverImage"] = item;
-      // upload the image and send the link
-    }
-    if (item.fieldname === "startLocation[image]") {
-      // console.log("startLocation", item);
+    if (!result?.secure_url)
+      return next(new AppError("Uplaoding Image Error", 500));
 
-      tourData.startLocation["image"] = tourData.startLocation.image
-        ? [...tourData.startLocation.image, item]
-        : [item];
-    }
-    if (item.fieldname.startsWith("locations")) {
-      // console.log("location", item);
-      // get the required index to the image link
-      let locationIndex = +item.fieldname.slice(10, 11);
-      tourData.locations[locationIndex]["image"] = tourData.locations[
+    // save link into the new document
+
+    if (fieldName === "coverImage") {
+      newTour[fieldName] = result.secure_url;
+    } else if (fieldName.startsWith("locations")) {
+      let locationIndex = +fieldName.slice(10, 11);
+
+      newTour["locations"][locationIndex]["images"] = newTour["locations"][
         locationIndex
-      ].image
-        ? [...tourData.locations[locationIndex].image, item]
-        : [item];
+      ]["images"]
+        ? [...newTour["locations"][locationIndex]["images"], result?.secure_url]
+        : [result?.secure_url];
+    } else if (fieldName.startsWith("startLocation")) {
+      newTour["startLocation"]["images"] = newTour["startLocation"]["images"]
+        ? [...newTour["startLocation"]["images"], result?.secure_url]
+        : [result?.secure_url];
+    } else {
+      newTour[fieldName] = newTour[fieldName]
+        ? [...newTour[fieldName], result?.secure_url]
+        : [result?.secure_url];
+    }
+
+    return true;
+  };
+
+  const fulldata = await req.files.map(async (item, i) => {
+    if (item.fieldname === "images") {
+      // upload the image and send the link
+      return await uploadByFolder(
+        item.buffer,
+        `tour/${newTour.id}/${item.fieldname}`,
+        item.fieldname
+      );
+    }
+
+    // get the cover image and upload the cover image
+    if (item.fieldname === "coverImage") {
+      return await uploadByFolder(
+        item.buffer,
+        `tour/${newTour.id}/${item.fieldname}`,
+        item.fieldname
+      );
+    }
+
+    // get startlocation image
+    if (item.fieldname === "startLocation[images]") {
+      return await uploadByFolder(
+        item.buffer,
+        `tour/${newTour.id}/${item.fieldname}`,
+        item.fieldname
+      );
+    }
+    // get all the location image
+    if (item.fieldname.startsWith("locations")) {
+      return await uploadByFolder(
+        item.buffer,
+        `tour/${newTour.id}/${item.fieldname}`,
+        item.fieldname
+      );
     }
   });
 
-  console.log(tourData);
-  // get the cover image and upload the cover image
+  const result = await Promise.all(fulldata);
 
-  // get all the feature image and upload it
-
-  // get startlocation image
-
-  // get all the location image
+  // uplaod the document to database after everything is complete
+  const realData = await newTour.save();
 
   // send the response
   res.status(201).json({
     status: "success",
+    message: "tour created successfully",
+    data: {
+      tour: realData,
+    },
   });
 });
 
@@ -98,7 +135,6 @@ exports.getTour = catchAsync(async function (req, res, next) {
 });
 
 exports.deleteTour = catchAsync(async function (req, res, next) {
-  console.log("Hi");
   let id = req.params?.id;
   if (!id) return next("No tour found to delete");
 

@@ -37,6 +37,7 @@ exports.upload = upload;
 
 exports.uploadCloudinary = function (buffer, folder) {
   return new Promise((resolve, reject) => {
+    // reject({ message: "error found", code: 400});
     cloudinary.uploader
       .upload_stream({ folder }, (error, result) => {
         if (error) {
