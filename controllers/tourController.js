@@ -115,9 +115,9 @@ exports.addTour = catchAsync(async function (req, res, next) {
 exports.getTour = catchAsync(async function (req, res, next) {
   const id = req.params?.tourId;
   console.log(req.params);
-  if (!id) return next(new AppError("No tour id found", 403));
+  if (!id) return next(new AppError("No tour id found", 404));
   const tour = await Tour.findById(id);
-  if (!tour) return next(new AppError("No tour found", 403));
+  if (!tour) return next(new AppError("No tour found", 404));
 
   res.status(200).json({
     status: "success",
@@ -128,26 +128,26 @@ exports.getTour = catchAsync(async function (req, res, next) {
 });
 
 exports.deleteTour = catchAsync(async function (req, res, next) {
-  let id = req.params?.id;
-  if (!id) return next("No tour found to delete");
+  let id = req.params?.tourId;
+  if (!id) return next(new AppError("No tour found to delete", 404));
 
-  const tour = await Tour.findOneAndDelete({ _id: id });
+  const deletedTour = await Tour.findByIdAndDelete(id);
+  if (!deletedTour) return next(new AppError("No tour found", 404));
 
   res.status(204).json({
     status: "success",
+    message: "Tour deleted successfully",
     data: {
-      tour,
+      deletedTour,
     },
   });
 });
 
 exports.updateTour = catchAsync(async function (req, res, next) {
-  let id;
-  if (req.params.id) {
-    id = req.params.id;
-  }
-  const updatedTour = await Tour.findByIdAndUpdate(id, req.body);
+  const id = req.params?.tourId;
 
+  if (!id) return next(new AppError("No tour found to delete", 404));
+  const updatedTour = await Tour.findByIdAndUpdate(id, req.body);
   res.status(200).json({
     status: "success",
     message: "Tour updated successfully",
