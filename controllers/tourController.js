@@ -113,18 +113,11 @@ exports.addTour = catchAsync(async function (req, res, next) {
 });
 
 exports.getTour = catchAsync(async function (req, res, next) {
-  let id;
-  if (req.params.id) {
-    id = req.params.id;
-  }
+  const id = req.params?.tourId;
+  console.log(req.params);
+  if (!id) return next(new AppError("No tour id found", 403));
   const tour = await Tour.findById(id);
-
-  if (!tour) {
-    res.status(404).json({
-      status: "fail",
-      message: "No tour found !",
-    });
-  }
+  if (!tour) return next(new AppError("No tour found", 403));
 
   res.status(200).json({
     status: "success",
