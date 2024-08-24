@@ -146,8 +146,14 @@ exports.deleteTour = catchAsync(async function (req, res, next) {
 exports.updateTour = catchAsync(async function (req, res, next) {
   const id = req.params?.tourId;
 
-  if (!id) return next(new AppError("No tour found to delete", 404));
-  const updatedTour = await Tour.findByIdAndUpdate(id, req.body);
+  if (!id) return next(new AppError("No tour found with the id", 404));
+
+  // new = true is for returning the updated data
+  const updatedTour = await Tour.findByIdAndUpdate(id, req.body, { new: true });
+
+  if (!updatedTour)
+    return next(new AppError("Cannot find a tour to update", 404));
+
   res.status(200).json({
     status: "success",
     message: "Tour updated successfully",

@@ -17,9 +17,10 @@ router
 router
   .route("/:tourId")
   .get(tourController.getTour)
-  .put(
+  .patch(
     authController.routeProtect,
     authController.authorise("admin"),
+    tourController.uploadFields,
     tourController.updateTour
   )
   .delete(
