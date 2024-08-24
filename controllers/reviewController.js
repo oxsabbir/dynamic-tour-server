@@ -54,3 +54,21 @@ exports.updateReview = catchAsync(async function (req, res, next) {
     },
   });
 });
+
+exports.deleteReview = catchAsync(async function (req, res, next) {
+  // getting the review id from params
+  let reviewId = req.params?.id;
+  if (!reviewId) return next(new AppError("No review id found", 404));
+
+  const deletedReview = await Review.findByIdAndDelete(reviewId);
+  if (!deletedReview)
+    return next(new AppError("No review found to delete", 400));
+
+  res.status(204).json({
+    status: "success",
+    message: "Review deleted successfully",
+    data: {
+      review: deletedReview,
+    },
+  });
+});
