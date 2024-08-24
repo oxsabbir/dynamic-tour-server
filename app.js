@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/userRouter");
 const authRouter = require("./routes/authRouter");
 const tourRouter = require("./routes/tourRouter");
+const reviewRouter = require("./routes/reviewRouter");
 
 // getting the http body data, Body parser
 app.use(express.json());
@@ -16,6 +17,7 @@ app.use(cookieParser());
 app.use("/api/v1/", authRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/tour", tourRouter);
+app.use("/api/v1/review", reviewRouter);
 
 // sending response for undefined route
 
