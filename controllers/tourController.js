@@ -2,6 +2,7 @@ const Tour = require("../models/Tour");
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
 const { upload, uploadCloudinary } = require("../utils/uploadFiles");
+const dummmy = require("mongoose-dummy");
 
 exports.getAllTours = catchAsync(async function (req, res, next) {
   const allTour = await Tour.find();

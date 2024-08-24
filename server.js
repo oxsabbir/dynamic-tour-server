@@ -26,7 +26,13 @@ const DATABASE_URL = process.env.DATABASE;
 const DATABASE_PASSWORD = process.env.PASSWORD;
 
 mongoose
-  .connect(DATABASE_URL.replace("<PASSWORD>", DATABASE_PASSWORD))
+  .connect(
+    DATABASE_URL.replace("<PASSWORD>", DATABASE_PASSWORD, {
+      useNewUrlParser: true,
+      useCreateIndex: true,
+      useFindAndModify: true,
+    })
+  )
   .then(() => console.log("DATABASE CONNECTED SUCCESSFULLY"));
 
 // starting server
