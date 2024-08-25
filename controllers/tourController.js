@@ -2,10 +2,41 @@ const Tour = require("../models/Tour");
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
 const { upload, uploadCloudinary } = require("../utils/uploadFiles");
-const dummmy = require("mongoose-dummy");
+
+class ApplyFilter {
+  constructor(queryObject) {
+    this.queryObject = queryObject;
+    this.newQueryObject = {};
+  }
+  init() {
+    const excluded = ["page", "sort", "limit", "field", "entries"];
+    Object.keys(this.queryObject).forEach((item) => {
+      if (!excluded.includes(item))
+        this.newQueryObject[item] = this.queryObject[item];
+    });
+    console.log(this.newQueryObject);
+    return this;
+  }
+
+  page() {}
+  sort() {
+    if (this.queryObject.sort) {
+    }
+  }
+  entries() {}
+  limit() {}
+  field() {}
+}
 
 exports.getAllTours = catchAsync(async function (req, res, next) {
+  const queryObject = req.query;
+
+  const filteredQuery = new ApplyFilter(queryObject);
+
+  console.log(filteredQuery.init().sort());
+
   const allTour = await Tour.find();
+
   res.status(200).json({
     status: "success",
     data: {
