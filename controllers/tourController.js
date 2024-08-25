@@ -4,38 +4,40 @@ const catchAsync = require("../utils/catchAsync");
 const { upload, uploadCloudinary } = require("../utils/uploadFiles");
 
 class ApplyFilter {
-  constructor(queryObject) {
-    this.queryObject = queryObject;
-    this.newQueryObject = {};
-  }
-  init() {
-    const excluded = ["page", "sort", "limit", "field", "entries"];
-    Object.keys(this.queryObject).forEach((item) => {
-      if (!excluded.includes(item))
-        this.newQueryObject[item] = this.queryObject[item];
-    });
-    console.log(this.newQueryObject);
-    return this;
+  constructor(userQuery, dataQuery) {
+    this.userQuery = userQuery;
+    this.dataQuery = dataQuery;
   }
 
-  page() {}
-  sort() {
-    if (this.queryObject.sort) {
-    }
+  init() {
+    return this;
   }
-  entries() {}
-  limit() {}
-  field() {}
+  page() {
+    // per page we show 6 data
+    let perPage = 10;
+    let skip = this.userQuery.page * perPage - perPage;
+    this.dataQuery.limit(perPage).skip(skip);
+    return this;
+  }
+  sort() {
+    return this;
+  }
+  limit() {
+    return this;
+  }
+  field() {
+    return this;
+  }
 }
 
 exports.getAllTours = catchAsync(async function (req, res, next) {
-  const queryObject = req.query;
+  const userQuery = req.query;
 
-  const filteredQuery = new ApplyFilter(queryObject);
+  const dataQuery = Tour.find();
 
-  console.log(filteredQuery.init().sort());
+  const filteredQuery = new ApplyFilter(userQuery, dataQuery);
 
-  const allTour = await Tour.find();
+  const allTour = await filteredQuery.page().dataQuery;
 
   res.status(200).json({
     status: "success",
