@@ -9,7 +9,23 @@ class ApplyFilter {
     this.dataQuery = dataQuery;
   }
 
-  init() {
+  filter() {
+    const queryObj = { ...this.userQuery };
+
+    const optField = ["page", "limit", "sort", "fields"];
+    // deleted the unwanted field for the method downbelow
+
+    optField.forEach((item) => delete queryObj[item]);
+
+    // checking for extra filter like less then and greater then
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(
+      /\b(gte | gt | lte | lt)/g,
+      (match) => `$${match}`
+    );
+
+    console.log(JSON.parse(queryStr));
+    this.dataQuery = this.dataQuery.find(JSON.parse(queryStr));
     return this;
   }
   page() {
@@ -22,10 +38,7 @@ class ApplyFilter {
   sort() {
     return this;
   }
-  limit() {
-    return this;
-  }
-  field() {
+  limitField() {
     return this;
   }
 }
@@ -35,9 +48,9 @@ exports.getAllTours = catchAsync(async function (req, res, next) {
 
   const dataQuery = Tour.find();
 
-  const filteredQuery = new ApplyFilter(userQuery, dataQuery);
+  const filteredQuery = new ApplyFilter(userQuery, dataQuery).filter();
 
-  const allTour = await filteredQuery.page().dataQuery;
+  const allTour = await filteredQuery.dataQuery;
 
   res.status(200).json({
     status: "success",
