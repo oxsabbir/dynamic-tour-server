@@ -19,18 +19,14 @@ class ApplyFilter {
 
     // checking for extra filter like less then and greater then
     let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(
-      /\b(gte | gt | lte | lt)/g,
-      (match) => `$${match}`
-    );
+    queryStr = queryStr.replace(/\blt|lte|gt|gte/g, (matches) => `$${matches}`);
 
-    console.log(JSON.parse(queryStr));
     this.dataQuery = this.dataQuery.find(JSON.parse(queryStr));
     return this;
   }
   page() {
-    // per page we show 6 data
-    let perPage = 10;
+    // default page would be 10 item per page
+    let perPage = this.userQuery?.limit || 10;
     let skip = this.userQuery.page * perPage - perPage;
     this.dataQuery.limit(perPage).skip(skip);
     return this;
@@ -48,7 +44,7 @@ exports.getAllTours = catchAsync(async function (req, res, next) {
 
   const dataQuery = Tour.find();
 
-  const filteredQuery = new ApplyFilter(userQuery, dataQuery).filter();
+  const filteredQuery = new ApplyFilter(userQuery, dataQuery).filter().page();
 
   const allTour = await filteredQuery.dataQuery;
 
