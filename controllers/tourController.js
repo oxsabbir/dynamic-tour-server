@@ -12,7 +12,7 @@ class ApplyFilter {
   filter() {
     const queryObj = { ...this.userQuery };
 
-    const optField = ["page", "limit", "sort", "fields"];
+    const optField = ["page", "limit", "sort", "field"];
     // deleted the unwanted field for the method downbelow
 
     optField.forEach((item) => delete queryObj[item]);
@@ -32,19 +32,31 @@ class ApplyFilter {
     return this;
   }
   sort() {
+    if (this.userQuery.sort) {
+      const sortValue = this.userQuery.sort.split(",").join(" ");
+      this.dataQuery.sort(sortValue);
+    }
     return this;
   }
+
   limitField() {
+    if (this.userQuery.field) {
+      const fieldData = this.userQuery.field.split(",").join(" ");
+      this.dataQuery.select(fieldData);
+    }
     return this;
   }
 }
 
 exports.getAllTours = catchAsync(async function (req, res, next) {
   const userQuery = req.query;
-
   const dataQuery = Tour.find();
 
-  const filteredQuery = new ApplyFilter(userQuery, dataQuery).filter().page();
+  const filteredQuery = new ApplyFilter(userQuery, dataQuery)
+    .filter()
+    .page()
+    .sort()
+    .limitField();
 
   const allTour = await filteredQuery.dataQuery;
 
