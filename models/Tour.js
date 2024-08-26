@@ -70,6 +70,7 @@ const tourSchema = new mongoose.Schema(
     createdAt: {
       type: Date,
       default: Date.now(),
+      select: false,
     },
 
     updatedAt: {
@@ -78,6 +79,8 @@ const tourSchema = new mongoose.Schema(
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+// using document middleware to do some operation
 
 const tourModel = mongoose.model("Tour", tourSchema);
 

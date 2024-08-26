@@ -3,6 +3,8 @@ const router = express.Router();
 
 const tourController = require("../controllers/tourController");
 const authController = require("../controllers/authController");
+const reviewRouter = require("../routes/reviewRouter");
+const reviewController = require("../controllers/reviewController");
 
 router
   .route("/")
@@ -13,6 +15,8 @@ router
     tourController.uploadFields,
     tourController.addTour
   );
+
+router.use("/:tourId/review", reviewRouter);
 
 router
   .route("/:tourId")

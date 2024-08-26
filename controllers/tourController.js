@@ -2,51 +2,7 @@ const Tour = require("../models/Tour");
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
 const { upload, uploadCloudinary } = require("../utils/uploadFiles");
-
-class ApplyFilter {
-  constructor(userQuery, dataQuery) {
-    this.userQuery = userQuery;
-    this.dataQuery = dataQuery;
-  }
-
-  filter() {
-    const queryObj = { ...this.userQuery };
-
-    const optField = ["page", "limit", "sort", "field"];
-    // deleted the unwanted field for the method downbelow
-
-    optField.forEach((item) => delete queryObj[item]);
-
-    // checking for extra filter like less then and greater then
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\blt|lte|gt|gte/g, (matches) => `$${matches}`);
-
-    this.dataQuery = this.dataQuery.find(JSON.parse(queryStr));
-    return this;
-  }
-  page() {
-    // default page would be 10 item per page
-    let perPage = this.userQuery?.limit || 10;
-    let skip = this.userQuery.page * perPage - perPage;
-    this.dataQuery.limit(perPage).skip(skip);
-    return this;
-  }
-  sort() {
-    if (this.userQuery.sort) {
-      const sortValue = this.userQuery.sort.split(",").join(" ");
-      this.dataQuery.sort(sortValue);
-    }
-    return this;
-  }
-
-  limitField() {
-    if (this.userQuery.field) {
-      const fieldData = this.userQuery.field.split(",").join(" ");
-      this.dataQuery.select(fieldData);
-    }
-    return this;
-  }
-}
+const ApplyFilter = require("../utils/ApplyFilter");
 
 exports.getAllTours = catchAsync(async function (req, res, next) {
   const userQuery = req.query;
@@ -171,7 +127,7 @@ exports.getTour = catchAsync(async function (req, res, next) {
   const id = req.params?.tourId;
   console.log(req.params);
   if (!id) return next(new AppError("No tour id found", 404));
-  const tour = await Tour.findById(id);
+  const tour = await Tour.findById(id).select("+createdAt");
   if (!tour) return next(new AppError("No tour found", 404));
 
   res.status(200).json({

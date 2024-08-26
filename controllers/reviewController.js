@@ -1,10 +1,11 @@
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
-
 const Review = require("../models/Review");
 
 exports.getAllReview = catchAsync(async function (req, res, next) {
-  const review = await Review.find();
+  const tourId = req.params?.tourId;
+
+  const review = await Review.find(tourId ? { tour: tourId } : null);
 
   res.status(200).json({
     status: "success",
@@ -16,9 +17,28 @@ exports.getAllReview = catchAsync(async function (req, res, next) {
   });
 });
 
+exports.getReview = catchAsync(async function (req, res, next) {
+  const reviewId = req.params?.id;
+
+  const review = await Review.findById(reviewId);
+
+  if (!review) return next(new AppError("No review found", 404));
+  res.status(200).json({
+    status: "success",
+    message: "Retrive review successfully",
+    data: {
+      review,
+    },
+  });
+});
+
 exports.addReview = catchAsync(async function (req, res, next) {
   // setting the body user to login user
   req.body.user = req.user?.id;
+
+  if (req.params?.tourId) {
+    req.body.tour = req.params?.tourId;
+  }
 
   const review = await Review.create(req.body);
   if (!review)
@@ -36,6 +56,7 @@ exports.addReview = catchAsync(async function (req, res, next) {
 exports.updateReview = catchAsync(async function (req, res, next) {
   // getting the review id from params
   let reviewId = req.params?.id;
+
   if (!reviewId) return next(new AppError("No review id found", 404));
   // setting the body user to loggedin user
   req.body.user = req.user?.id;
