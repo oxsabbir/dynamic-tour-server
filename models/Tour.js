@@ -4,23 +4,23 @@ const tourSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      require: [true, "Tour must have a title"],
+      required: [true, "Tour must have a title"],
     },
     description: {
       type: String,
-      require: [true, "Tour must have a description"],
+      required: [true, "Tour must have a description"],
     },
     summery: {
       type: String,
     },
     totalParticipant: {
       type: Number,
-      require: [true, "Tour must have participant details"],
+      required: [true, "Tour must have participant details"],
     },
 
     price: {
       type: Number,
-      require: [true, "Tour must have a price"],
+      required: [true, "Tour must have a price"],
     },
     discountPrice: Number,
 
