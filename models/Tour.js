@@ -80,6 +80,14 @@ const tourSchema = new mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+// setting the virtual populate to show the review on the tour data
+// even it's located inside a different resouces
+tourSchema.virtual("reviews", {
+  ref: "Review",
+  localField: "_id",
+  foreignField: "tour",
+});
+
 // using document middleware to do some operation
 
 const tourModel = mongoose.model("Tour", tourSchema);

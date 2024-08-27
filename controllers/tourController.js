@@ -125,9 +125,9 @@ exports.addTour = catchAsync(async function (req, res, next) {
 
 exports.getTour = catchAsync(async function (req, res, next) {
   const id = req.params?.tourId;
-  console.log(req.params);
+
   if (!id) return next(new AppError("No tour id found", 404));
-  const tour = await Tour.findById(id).select("+createdAt");
+  const tour = await Tour.findById(id).select("+createdAt").populate("reviews");
   if (!tour) return next(new AppError("No tour found", 404));
 
   res.status(200).json({
