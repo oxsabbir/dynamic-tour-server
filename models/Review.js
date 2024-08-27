@@ -33,6 +33,15 @@ const reviewSchema = new mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+// using the query middleware to populate the user inside the reviews
+reviewSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "user",
+    select: "fullName profileImage firstName lastName",
+  });
+  next();
+});
+
 const reviewModel = mongoose.model("Review", reviewSchema);
 
 module.exports = reviewModel;
