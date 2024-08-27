@@ -29,7 +29,11 @@ const tourSchema = new mongoose.Schema(
     images: [String],
 
     totalRating: Number,
-    ratingsAverage: Number,
+
+    ratingsAverage: {
+      type: Number,
+      default: 4.5,
+    },
 
     guides: [
       {

@@ -70,6 +70,11 @@ const userSchema = new mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+// creating the fullname using the virtual Properties
+userSchema.virtual("fullName").get(function () {
+  return this.firstName + " " + this.lastName;
+});
+
 // using the instance method to check the password if it's correct or not
 userSchema.methods.checkPassword = async function (
   storedPassword,
