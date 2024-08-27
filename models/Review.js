@@ -56,6 +56,7 @@ reviewSchema.statics.calculateRating = async function (tourId) {
       },
     },
   ]);
+
   if (stats.length > 0) {
     await Tour.findByIdAndUpdate(tourId, {
       totalRating: stats[0]?.nRating,
@@ -73,6 +74,20 @@ reviewSchema.statics.calculateRating = async function (tourId) {
 reviewSchema.post("save", function () {
   console.log(this.tour._id);
   this.constructor.calculateRating(this.tour._id);
+});
+
+// calling the method again to recalculate again if review was deleted or updated
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+  // passing the current document clone from where we can found the model and call the statics method
+  this.currentDoc = await this.clone().findOne();
+  next();
+});
+
+// calling the actual function to calculate the rating and average
+
+reviewSchema.post(/^findOneAnd/, async function () {
+  const tourId = this.currentDoc?.tour;
+  this.currentDoc.constructor.calculateRating(tourId);
 });
 
 const reviewModel = mongoose.model("Review", reviewSchema);
