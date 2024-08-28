@@ -67,7 +67,7 @@ exports.signUp = catchAsync(async function (req, res, next) {
 
   console.log(newUser);
 
-  const token = generateToken();
+  const token = generateToken(newUser?._id);
 
   sendCookie(res, "jwt", token);
 
@@ -136,19 +136,28 @@ exports.routeProtect = catchAsync(async function (req, res, next) {
     return next(new AppError("Please login to get access", 401));
   }
   // check if the JWT valid or not
-
-  // check the JWT expires or not
   const validToken = jwt.verify(token, process.env.JWT_SECRET);
+
+  // check the JWT expires or not / we don't need to verify it jwt does it for us
 
   if (!validToken)
     return next(new AppError("Invalid access token, please login again", 401));
 
   // check if user exist by the id of JWT
   const user = await User.findOne({ _id: validToken.id }).select(
-    "-password -__v "
+    "-password -__v +passwordChangedAt"
   );
-  if (!user) return next(new AppError("No user found with your token", 403));
   // check if user changed password after JWT was assigned by password updated time on the userDocument
+  if (user?.passwordChangedAt) {
+    const isPassChanged =
+      Math.round(new Date(user.passwordChangedAt).getTime() / 1000 - 2000) >
+      validToken.iat;
+
+    if (isPassChanged)
+      return next(new AppError("Invalid token. Please login again", 401));
+  }
+
+  if (!user) return next(new AppError("No user found with your token", 403));
   // finally add the user to req.user
   req.user = user;
   req.userRole = user.role;
@@ -200,7 +209,8 @@ exports.updateProfile = catchAsync(async function (req, res, next) {
     "userName",
     "isActive",
     "password",
-    "createdAt"
+    "createdAt",
+    "passwordChangedAt"
   );
 
   // getting the image file
@@ -250,3 +260,63 @@ exports.getMe = catchAsync(async function (req, res, next) {
     },
   });
 });
+
+// logout from server
+
+// change password
+exports.changePassword = catchAsync(async function (req, res, next) {
+  const data = req.body;
+  if (!data?.currentPassword)
+    return next(new AppError("Provide the current password to verify", 403));
+
+  if (!data?.newPassword)
+    return next(new AppError("Give a new password to change with", 403));
+  if (!data?.confirmPassword)
+    return next(new AppError("Confirm both of the password", 403));
+
+  // check if current password is correct
+  const userId = req.user?.id;
+  const currentUser = await User.findById(userId);
+  const isPasswordCorrect = await currentUser.checkPassword(
+    currentUser.password,
+    data.currentPassword
+  );
+
+  if (!isPasswordCorrect)
+    return next(
+      new AppError(
+        "Current password didn't match. please provide correct password to begin",
+        403
+      )
+    );
+
+  // if everything goes well changing the password
+  currentUser.password = data.newPassword;
+  currentUser.confirmPassword = data.confirmPassword;
+  currentUser.passwordChangedAt = Date.now(); // adding 2 second to add a slight delay cause of the latency
+  // set the newPassword
+  const user = await currentUser.save({ validateBeforeSave: true });
+
+  if (!user)
+    return next(
+      new AppError("Something went wrong while changing the password", 500)
+    );
+
+  const token = generateToken(user?._id);
+
+  // send response
+  sendCookie(res, "jwt", token);
+
+  // return the response
+  res.status(200).json({
+    status: "success",
+    message: "Password changed successfully",
+    data: {
+      token,
+    },
+  });
+
+  // logout the user to login again
+});
+
+// reset password

@@ -45,6 +45,10 @@ const userSchema = new mongoose.Schema(
       require: [true, "A password is require to create an account"],
       min: [6, "A password require 6 or more character"],
     },
+    passwordChangedAt: {
+      type: Date,
+      select: false,
+    },
     confirmPassword: {
       type: String,
       require: [true, "Please confirm the password"],
@@ -80,7 +84,6 @@ userSchema.methods.checkPassword = async function (
   storedPassword,
   providedPassword
 ) {
-  console.log(storedPassword);
   const isCorrect = await bcrypt.compare(providedPassword, storedPassword);
   return isCorrect;
 };

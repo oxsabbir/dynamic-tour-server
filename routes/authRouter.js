@@ -12,6 +12,11 @@ router.post(
   authController.uploadSingle,
   authController.updateProfile
 );
+router.post(
+  "/changePassword",
+  authController.routeProtect,
+  authController.changePassword
+);
 
 router.get("/getMe", authController.routeProtect, authController.getMe);
 
