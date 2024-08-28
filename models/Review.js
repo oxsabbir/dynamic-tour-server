@@ -44,6 +44,9 @@ reviewSchema.pre(/^find/, function (next) {
   next();
 });
 
+// indexing the tour and user to be able to set the review to unique to a user
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
 // using the statics methods and aggregation to calculate the totalRating and ratingsAverage
 reviewSchema.statics.calculateRating = async function (tourId) {
   const stats = await this.aggregate([
