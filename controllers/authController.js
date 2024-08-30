@@ -132,9 +132,9 @@ exports.routeProtect = catchAsync(async function (req, res, next) {
     // check if it's on the cookie
   } else if (req.cookies.jwt) {
     token = req.cookies.jwt;
-  } else {
-    return next(new AppError("Please login to get access", 401));
   }
+  if (!token || token === "null")
+    return next(new AppError("Please login to get access", 401));
   // check if the JWT valid or not
   const validToken = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -291,7 +291,8 @@ exports.changePassword = catchAsync(async function (req, res, next) {
   // if everything goes well changing the password
   currentUser.password = data.newPassword;
   currentUser.confirmPassword = data.confirmPassword;
-  currentUser.passwordChangedAt = Date.now() + 2000; // adding 4 second to add a slight delay cause of the latency
+  currentUser.passwordChangedAt = Date.now() - 10000;
+  console.log(Date.now() / 1000);
   // set the newPassword
   const user = await currentUser.save({ validateBeforeSave: true });
 
@@ -299,17 +300,20 @@ exports.changePassword = catchAsync(async function (req, res, next) {
     return next(
       new AppError("Something went wrong while changing the password", 500)
     );
-  // const token = generateToken(user?._id);
+
+  console.log(user);
+
+  const token = generateToken(user?._id);
   // send response
-  // sendCookie(res, "jwt", token);
+  sendCookie(res, "jwt", token);
 
   // return the response
   res.status(200).json({
     status: "success",
     message: "Password changed successfully",
-    // data: {
-    //   token,
-    // },
+    data: {
+      token,
+    },
   });
 
   // logout the user to login again

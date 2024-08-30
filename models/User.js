@@ -86,6 +86,8 @@ userSchema.methods.checkIsPasswordChanged = function (
 ) {
   const changeTimeStamp = Math.round(new Date(changedTime).getTime() / 1000);
   // if the changeTimeStamp is greater then jwtTimeStamp then . is return true that mean password changed after login token is not valid anymore
+  console.log(jwtTimeStamp, "JWT");
+  console.log(changeTimeStamp, "PASS");
   return changeTimeStamp > jwtTimeStamp;
 };
 
