@@ -79,6 +79,16 @@ userSchema.virtual("fullName").get(function () {
   return this.firstName + " " + this.lastName;
 });
 
+// checking if user password is changed or not
+userSchema.methods.checkIsPasswordChanged = function (
+  jwtTimeStamp,
+  changedTime
+) {
+  const changeTimeStamp = Math.round(new Date(changedTime).getTime() / 1000);
+  // if the changeTimeStamp is greater then jwtTimeStamp then . is return true that mean password changed after login token is not valid anymore
+  return changeTimeStamp > jwtTimeStamp;
+};
+
 // using the instance method to check the password if it's correct or not
 userSchema.methods.checkPassword = async function (
   storedPassword,
