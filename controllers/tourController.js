@@ -50,9 +50,6 @@ exports.addAndUpdateTour = function (actionType) {
       tourData = editableTour;
     }
 
-    if (req.files.length < 1)
-      return next(new AppError("No image file found", 404));
-
     // creating newTour doucment will save it later down
     let newTour = new Tour(tourData);
     if (actionType === "edit") {
@@ -94,7 +91,7 @@ exports.addAndUpdateTour = function (actionType) {
       return true;
     };
 
-    const fulldata = await req.files.map(async (item, i) => {
+    const fulldata = await req.files?.map(async (item, i) => {
       if (item.fieldname === "images") {
         // upload the image and send the link
         return await uploadByFolder(
@@ -131,11 +128,12 @@ exports.addAndUpdateTour = function (actionType) {
       }
     });
 
+    // stopping the code for image to uplaod and then send the response
     const result = await Promise.all(fulldata);
 
     // uplaod the document to database after everything is complete
-    let realData;
 
+    let realData;
     if (actionType === "add") {
       realData = await newTour.save();
     }
@@ -186,26 +184,6 @@ exports.deleteTour = catchAsync(async function (req, res, next) {
     message: "Tour deleted successfully",
     data: {
       deletedTour,
-    },
-  });
-});
-
-exports.updateTour = catchAsync(async function (req, res, next) {
-  const id = req.params?.tourId;
-
-  if (!id) return next(new AppError("No tour found with the id", 404));
-
-  // new = true is for returning the updated data
-  const updatedTour = await Tour.findByIdAndUpdate(id, req.body, { new: true });
-
-  if (!updatedTour)
-    return next(new AppError("Cannot find a tour to update", 404));
-
-  res.status(200).json({
-    status: "success",
-    message: "Tour updated successfully",
-    data: {
-      tour: updatedTour,
     },
   });
 });
