@@ -16,12 +16,13 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: "http://localhost:3000", // Allow requests from this origin
+    origin: "http://localhost:3000",
+    // Allow requests from this origin
+    // only for local development now
   })
 );
 // Defining required routes
 app.use("/api/v1/", authRouter);
-app.use("/api/v1/search", tourController.searchTour);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/tour", tourRouter);
 app.use("/api/v1/review", reviewRouter);

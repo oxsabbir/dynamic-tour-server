@@ -26,23 +26,6 @@ exports.getAllTours = catchAsync(async function (req, res, next) {
   });
 });
 
-exports.searchTour = catchAsync(async function (req, res, next) {
-  const { query } = req.query;
-  if (!query) return next(AppError("No search query found", 404));
-  const tour = await Tour.find({
-    $text: { $search: query },
-  });
-
-  res.status(200).json({
-    status: "success",
-    message: "found results",
-    data: {
-      total: tour.length,
-      tour,
-    },
-  });
-});
-
 // upload middleware
 exports.uploadFields = upload.any();
 
