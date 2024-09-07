@@ -4,6 +4,11 @@ const authController = require("../controllers/authController");
 const router = express.Router();
 
 router.post("/signup", authController.uploadSingle, authController.signUp);
+router.post(
+  "/sign-in-with-google",
+  authController.uploadSingle,
+  authController.signInWithGoogle
+);
 router.post("/login", authController.login);
 
 router.post(

@@ -162,6 +162,8 @@ exports.addAndUpdateTour = function (actionType) {
 exports.getTour = catchAsync(async function (req, res, next) {
   const id = req.params?.tourId;
 
+  console.log(req.headers);
+
   console.log("hi");
   if (!id) return next(new AppError("No tour id found", 404));
   const tour = await Tour.findById(id)

@@ -18,6 +18,7 @@ const sendCookie = function (res, name, val, options) {
   let cookieOption = {};
   if (!options) {
     cookieOption.maxAge = 10000 * 60 * 10;
+    cookieOption.httpOnly = true;
   }
 
   if (process.env.NODE_ENV === "production") {
@@ -301,8 +302,6 @@ exports.changePassword = catchAsync(async function (req, res, next) {
       new AppError("Something went wrong while changing the password", 500)
     );
 
-  console.log(user);
-
   const token = generateToken(user?._id);
   // send response
   sendCookie(res, "jwt", token);
@@ -320,3 +319,13 @@ exports.changePassword = catchAsync(async function (req, res, next) {
 });
 
 // reset password
+
+// sign in using google
+exports.signInWithGoogle = catchAsync(async function (req, res, next) {
+  // check if user already exist
+  const bodyData = req.body;
+  console.log(body);
+  next();
+  // if not create a new user using the provided username and email
+  // then generate and send the authenticate token
+});
