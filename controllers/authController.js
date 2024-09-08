@@ -107,6 +107,12 @@ exports.login = catchAsync(async function (req, res, next) {
     return next("Please provide a valid email and password combination");
   // generate JSONWEBTOKEN
   const token = generateToken(userData._id);
+  // const userForSession = {
+  //   name: userData?.fullName,
+  //   image: userData?.profileImage,
+  //   email: userData?.email,
+  //   role: userData?.role,
+  // };
   // add the userData data  to req object req.userData = data
 
   // send response

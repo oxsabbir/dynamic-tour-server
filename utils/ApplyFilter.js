@@ -22,8 +22,9 @@ class ApplyFilter {
   query() {
     if (this.userQuery.query) {
       const searchQuery = this.userQuery?.query;
+      let escapedQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       this.dataQuery.find({
-        title: { $regex: searchQuery, $options: "i" },
+        title: { $regex: escapedQuery, $options: "i" },
       });
     }
     return this;
