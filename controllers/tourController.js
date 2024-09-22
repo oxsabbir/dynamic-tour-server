@@ -28,6 +28,10 @@ exports.getAllTours = catchAsync(async function (req, res, next) {
 // upload middleware
 exports.uploadFields = upload.any();
 
+// upload by destination
+
+// devide by destination
+
 exports.addTour = catchAsync(async function (req, res, next) {
   // get the body data and filter it
   let tourData;
