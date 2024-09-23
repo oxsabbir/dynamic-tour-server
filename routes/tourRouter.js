@@ -13,7 +13,7 @@ router
     authController.routeProtect,
     authController.authorise("admin"),
     tourController.uploadFields,
-    tourController.addTour
+    tourController.addAndUpdateTour("add")
   );
 
 router.use("/:tourId/review", reviewRouter);
@@ -25,7 +25,7 @@ router
     authController.routeProtect,
     authController.authorise("admin"),
     tourController.uploadFields,
-    tourController.updateTour
+    tourController.addAndUpdateTour("edit")
   )
   .delete(
     authController.routeProtect,
