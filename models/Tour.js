@@ -84,6 +84,8 @@ const tourSchema = new mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+tourSchema.index({ title: "text", description: "text" });
+
 // setting the virtual populate to show the review on the tour data
 // even it's located inside a different resouces
 tourSchema.virtual("reviews", {

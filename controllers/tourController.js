@@ -10,6 +10,7 @@ exports.getAllTours = catchAsync(async function (req, res, next) {
 
   const filteredQuery = new ApplyFilter(userQuery, dataQuery)
     .filter()
+    .query()
     .page()
     .sort()
     .limitField();
@@ -21,6 +22,23 @@ exports.getAllTours = catchAsync(async function (req, res, next) {
     data: {
       total: allTour.length,
       tour: allTour,
+    },
+  });
+});
+
+exports.searchTour = catchAsync(async function (req, res, next) {
+  const { query } = req.query;
+  if (!query) return next(AppError("No search query found", 404));
+  const tour = await Tour.find({
+    $text: { $search: query },
+  });
+
+  res.status(200).json({
+    status: "success",
+    message: "found results",
+    data: {
+      total: tour.length,
+      tour,
     },
   });
 });

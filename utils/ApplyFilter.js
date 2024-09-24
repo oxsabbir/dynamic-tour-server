@@ -7,7 +7,7 @@ class ApplyFilter {
   filter() {
     const queryObj = { ...this.userQuery };
 
-    const optField = ["page", "limit", "sort", "field"];
+    const optField = ["page", "limit", "sort", "field", "query"];
     // deleted the unwanted field for the method downbelow
 
     optField.forEach((item) => delete queryObj[item]);
@@ -17,6 +17,15 @@ class ApplyFilter {
     queryStr = queryStr.replace(/\blt|lte|gt|gte/g, (matches) => `$${matches}`);
 
     this.dataQuery = this.dataQuery.find(JSON.parse(queryStr));
+    return this;
+  }
+  query() {
+    if (this.userQuery.query) {
+      const searchQuery = this.userQuery?.query;
+      this.dataQuery.find({
+        $text: { $search: searchQuery },
+      });
+    }
     return this;
   }
   page() {
