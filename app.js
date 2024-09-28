@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
 const userRouter = require("./routes/userRouter");
 const authRouter = require("./routes/authRouter");
@@ -13,6 +14,11 @@ app.use(express.json());
 // setting cookie parser
 app.use(cookieParser());
 
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Allow requests from this origin
+  })
+);
 // Defining required routes
 app.use("/api/v1/", authRouter);
 app.use("/api/v1/search", tourController.searchTour);

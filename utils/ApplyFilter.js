@@ -23,7 +23,7 @@ class ApplyFilter {
     if (this.userQuery.query) {
       const searchQuery = this.userQuery?.query;
       this.dataQuery.find({
-        $text: { $search: searchQuery },
+        title: { $regex: searchQuery, $options: "i" },
       });
     }
     return this;
