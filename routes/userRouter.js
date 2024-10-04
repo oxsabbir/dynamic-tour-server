@@ -12,4 +12,8 @@ router
     userController.getAllUser
   );
 
+router
+  .route("/:userId")
+  .get(authController.routeProtect, userController.getUser);
+
 module.exports = router;

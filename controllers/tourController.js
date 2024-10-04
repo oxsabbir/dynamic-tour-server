@@ -91,7 +91,8 @@ exports.addAndUpdateTour = function (actionType) {
       return true;
     };
 
-    const fulldata = await req.files?.map(async (item, i) => {
+    const fulldata = await req?.files?.map(async (item, i) => {
+      console.log(item.buffer);
       if (item.fieldname === "images") {
         // upload the image and send the link
         return await uploadByFolder(
@@ -129,6 +130,7 @@ exports.addAndUpdateTour = function (actionType) {
     });
 
     // stopping the code for image to uplaod and then send the response
+
     const result = await Promise.all(fulldata);
 
     // uplaod the document to database after everything is complete
@@ -160,8 +162,15 @@ exports.addAndUpdateTour = function (actionType) {
 exports.getTour = catchAsync(async function (req, res, next) {
   const id = req.params?.tourId;
 
+  console.log("hi");
   if (!id) return next(new AppError("No tour id found", 404));
-  const tour = await Tour.findById(id).select("+createdAt").populate("reviews");
+  const tour = await Tour.findById(id)
+    .select("+createdAt")
+    .populate([
+      { path: "guides", select: "-password -role" },
+      { path: "reviews" },
+    ]);
+
   if (!tour) return next(new AppError("No tour found", 404));
 
   res.status(200).json({

@@ -37,7 +37,7 @@ const tourSchema = new mongoose.Schema(
 
     guides: [
       {
-        type: mongoose.Schema.ObjectId,
+        type: mongoose.SchemaTypes.ObjectId,
         ref: "User",
       },
     ],

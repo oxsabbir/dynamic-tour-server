@@ -13,4 +13,16 @@ exports.getAllUser = catchAsync(async function (req, res, next) {
   });
 });
 
+exports.getUser = catchAsync(async function (req, res, next) {
+  let id = req.params?.userId;
+  const user = await User.findById(id).select("-password -__v -createdAt");
+  res.status(200).json({
+    status: "success",
+    message: "User data retrive successfully",
+    data: {
+      user,
+    },
+  });
+});
+
 exports.updateUser = catchAsync(async function (req, res, next) {});
