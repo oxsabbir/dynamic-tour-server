@@ -7,20 +7,20 @@ const userSchema = new mongoose.Schema(
     firstName: {
       type: String,
       required: [true, "A user must have firstname"],
-      max: [30, "Cannot have more then 40 character for firstname"],
+      max: [25, "Cannot have more then 25 character for firstname"],
       min: [3, "Cannout have lesser then 3 character for firstname"],
     },
     lastName: {
       type: String,
       required: [true, "A user must have lastname"],
-      max: [30, "Cannot have more then 40 character for lastname"],
+      max: [25, "Cannot have more then 25 character for lastname"],
       min: [3, "Cannout have lesser then 3 character for lastname"],
     },
     userName: {
       type: String,
       require: [true, "A unique username is require"],
       unique: true,
-      max: [30, "Cannot have more then 40 character for username"],
+      max: [25, "Cannot have more then 25 character for username"],
       min: [3, "Cannout have lesser then 3 character for username"],
     },
     email: {
@@ -52,7 +52,7 @@ const userSchema = new mongoose.Schema(
     confirmPassword: {
       type: String,
       require: [true, "Please confirm the password"],
-      min: [6, "A password require 6 or more character"],
+      min: [8, "A password require 8 or more character"],
       validate: {
         validator: function (el) {
           return this.password === el;
@@ -86,8 +86,6 @@ userSchema.methods.checkIsPasswordChanged = function (
 ) {
   const changeTimeStamp = Math.round(new Date(changedTime).getTime() / 1000);
   // if the changeTimeStamp is greater then jwtTimeStamp then . is return true that mean password changed after login token is not valid anymore
-  console.log(jwtTimeStamp, "JWT");
-  console.log(changeTimeStamp, "PASS");
   return changeTimeStamp > jwtTimeStamp;
 };
 
