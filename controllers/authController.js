@@ -330,21 +330,41 @@ exports.changePassword = catchAsync(async function (req, res, next) {
 
 // sign in using google
 exports.signInWithGoogle = catchAsync(async function (req, res, next) {
+  // creating user
+  const createGoogleUser = async function (userInfo) {
+    console.log(userInfo);
+    const newUser = await User.create(userInfo);
+    console.log(newUser);
+    const token = generateToken(newUser.id);
+    res.status(200).json({
+      status: "success",
+      message: "User created successfully",
+      data: {
+        token,
+        user: newUser,
+      },
+    });
+  };
+
+  // sending access token for existing user
+  const loggingGoogleUser = function (userInfo) {
+    const token = generateToken(userInfo.id);
+    res.status(200).json({
+      status: "success",
+      data: {
+        token,
+      },
+    });
+  };
   // check if user already exist
+  const user = await User.findOne({ email: req.body.email });
+  console.log(user);
 
-  // if not create new user with provided information
-
-  // and generate a access token
-
-  // send response
-
-  const bodyData = req.body;
-  console.log(bodyData);
-  res.status(200).json({
-    user: {
-      ...bodyData,
-    },
-  });
-  // if not create a new user using the provided username and email
-  // then generate and send the authenticate token
+  // if not create new user with provided information and sending token
+  if (!user) {
+    createGoogleUser(req.body);
+  } else {
+    // if user exist loggin him/her in by sending access token
+    loggingGoogleUser(user);
+  }
 });

@@ -100,7 +100,7 @@ userSchema.methods.checkPassword = async function (
 
 // hashing password before saving using document middleware
 userSchema.pre("save", async function (next) {
-  console.log();
+  if (!this.password) next();
   // checking if the password has been modified before
   if (!this.isModified()) return next();
 
