@@ -332,7 +332,6 @@ exports.changePassword = catchAsync(async function (req, res, next) {
 exports.signInWithGoogle = catchAsync(async function (req, res, next) {
   // creating user
   const createGoogleUser = async function (userInfo) {
-    console.log(userInfo);
     const newUser = await User.create(userInfo);
     console.log(newUser);
     const token = generateToken(newUser.id);
@@ -358,7 +357,6 @@ exports.signInWithGoogle = catchAsync(async function (req, res, next) {
   };
   // check if user already exist
   const user = await User.findOne({ email: req.body.email });
-  console.log(user);
 
   // if not create new user with provided information and sending token
   if (!user) {
