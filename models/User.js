@@ -42,8 +42,8 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      require: [true, "A password is require to create an account"],
-      min: [6, "A password require 6 or more character"],
+      // require: [true, "A password is require to create an account"],
+      min: [8, "A password require 6 or more character"],
     },
     passwordChangedAt: {
       type: Date,
@@ -51,7 +51,7 @@ const userSchema = new mongoose.Schema(
     },
     confirmPassword: {
       type: String,
-      require: [true, "Please confirm the password"],
+      // require: [true, "Please confirm the password"],
       min: [8, "A password require 8 or more character"],
       validate: {
         validator: function (el) {

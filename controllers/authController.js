@@ -32,6 +32,8 @@ exports.uploadSingle = upload.single("profileImage");
 exports.signUp = catchAsync(async function (req, res, next) {
   // validate the requestBody remove the role if user send it
   let userData = req.body;
+  if (!req.body.password || !req.body.confirmPassword)
+    return next("Password is required");
 
   if (req.body.role) {
     userData.role = undefined;
@@ -329,6 +331,13 @@ exports.changePassword = catchAsync(async function (req, res, next) {
 // sign in using google
 exports.signInWithGoogle = catchAsync(async function (req, res, next) {
   // check if user already exist
+
+  // if not create new user with provided information
+
+  // and generate a access token
+
+  // send response
+
   const bodyData = req.body;
   console.log(bodyData);
   res.status(200).json({
