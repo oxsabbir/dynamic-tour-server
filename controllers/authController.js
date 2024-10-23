@@ -330,8 +330,12 @@ exports.changePassword = catchAsync(async function (req, res, next) {
 exports.signInWithGoogle = catchAsync(async function (req, res, next) {
   // check if user already exist
   const bodyData = req.body;
-  console.log(body);
-  next();
+  console.log(bodyData);
+  res.status(200).json({
+    user: {
+      ...bodyData,
+    },
+  });
   // if not create a new user using the provided username and email
   // then generate and send the authenticate token
 });
