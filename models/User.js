@@ -4,18 +4,13 @@ const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
   {
-    firstName: {
+    fullName: {
       type: String,
-      required: [true, "A user must have firstname"],
-      max: [25, "Cannot have more then 25 character for firstname"],
+      required: [true, "A user must have fullname"],
+      max: [25, "Cannot have more then 50 character for fullname"],
       min: [3, "Cannout have lesser then 3 character for firstname"],
     },
-    lastName: {
-      type: String,
-      required: [true, "A user must have lastname"],
-      max: [25, "Cannot have more then 25 character for lastname"],
-      min: [3, "Cannout have lesser then 3 character for lastname"],
-    },
+
     userName: {
       type: String,
       require: [true, "A unique username is require"],
@@ -49,6 +44,12 @@ const userSchema = new mongoose.Schema(
       type: Date,
       select: false,
     },
+    booking: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Booking",
+      },
+    ],
     confirmPassword: {
       type: String,
       // require: [true, "Please confirm the password"],
@@ -75,9 +76,9 @@ const userSchema = new mongoose.Schema(
 );
 
 // creating the fullname using the virtual Properties
-userSchema.virtual("fullName").get(function () {
-  return this.firstName + " " + this.lastName;
-});
+// userSchema.virtual("fullName").get(function () {
+//   return this.firstName + " " + this.lastName;
+// });
 
 // checking if user password is changed or not
 userSchema.methods.checkIsPasswordChanged = function (
