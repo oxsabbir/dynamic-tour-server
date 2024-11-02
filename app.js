@@ -41,6 +41,7 @@ app.use("/", (req, res, next) => {
 
 app.use((err, req, res, next) => {
   console.log("error from global -", err);
+  console.log(err);
   res.status(err.statusCode || 403).json({
     status: "error",
     message: err,

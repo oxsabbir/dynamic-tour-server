@@ -59,15 +59,51 @@ exports.addAndUpdateTour = function (actionType) {
     const uploadByFolder = async function (buffer, folder, fieldName) {
       // upload the file one after another
       const result = await uploadCloudinary(buffer, folder);
-
       if (!result?.secure_url)
         return next(new AppError("Uplaoding Image Error", 500));
+      return result;
+    };
 
-      // save link into the new document
+    const fulldata = await req?.files?.map(async (item, i) => {
+      const fieldName = item.fieldname;
+      if (item.fieldname.startsWith("images")) {
+        // upload the image and send the link
+        const result = await uploadByFolder(
+          item.buffer,
+          `tour/${newTour.id}/${fieldName}`
+        );
+        newTour["images"] = [...newTour["images"], result?.secure_url];
+      }
 
-      if (fieldName === "coverImage") {
+      // get the cover image and upload the cover image
+      if (item.fieldname === "coverImage") {
+        const result = await uploadByFolder(
+          item.buffer,
+          `tour/${newTour.id}/${item.fieldname}`,
+          item.fieldname
+        );
         newTour[fieldName] = result.secure_url;
-      } else if (fieldName.startsWith("locations")) {
+      }
+
+      // get startlocation image
+      if (item.fieldname === "startLocation[images]") {
+        const result = await uploadByFolder(
+          item.buffer,
+          `tour/${newTour.id}/${item.fieldname}`,
+          item.fieldname
+        );
+        newTour["startLocation"]["images"] = newTour["startLocation"]["images"]
+          ? [...newTour["startLocation"]["images"], result?.secure_url]
+          : [result?.secure_url];
+      }
+      // get all the location image
+      if (item.fieldname.startsWith("locations")) {
+        const result = await uploadByFolder(
+          item.buffer,
+          `tour/${newTour.id}/${item.fieldname}`,
+          item.fieldname
+        );
+
         let locationIndex = +fieldName.slice(10, 11);
 
         newTour["locations"][locationIndex]["images"] = newTour["locations"][
@@ -78,54 +114,6 @@ exports.addAndUpdateTour = function (actionType) {
               result?.secure_url,
             ]
           : [result?.secure_url];
-      } else if (fieldName.startsWith("startLocation")) {
-        newTour["startLocation"]["images"] = newTour["startLocation"]["images"]
-          ? [...newTour["startLocation"]["images"], result?.secure_url]
-          : [result?.secure_url];
-      } else {
-        newTour[fieldName] = newTour[fieldName]
-          ? [...newTour[fieldName], result?.secure_url]
-          : [result?.secure_url];
-      }
-
-      return true;
-    };
-
-    const fulldata = await req?.files?.map(async (item, i) => {
-      console.log(item.buffer);
-      if (item.fieldname === "images") {
-        // upload the image and send the link
-        return await uploadByFolder(
-          item.buffer,
-          `tour/${newTour.id}/${item.fieldname}`,
-          item.fieldname
-        );
-      }
-
-      // get the cover image and upload the cover image
-      if (item.fieldname === "coverImage") {
-        return await uploadByFolder(
-          item.buffer,
-          `tour/${newTour.id}/${item.fieldname}`,
-          item.fieldname
-        );
-      }
-
-      // get startlocation image
-      if (item.fieldname === "startLocation[images]") {
-        return await uploadByFolder(
-          item.buffer,
-          `tour/${newTour.id}/${item.fieldname}`,
-          item.fieldname
-        );
-      }
-      // get all the location image
-      if (item.fieldname.startsWith("locations")) {
-        return await uploadByFolder(
-          item.buffer,
-          `tour/${newTour.id}/${item.fieldname}`,
-          item.fieldname
-        );
       }
     });
 
