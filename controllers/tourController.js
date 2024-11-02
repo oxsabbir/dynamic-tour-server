@@ -64,7 +64,7 @@ exports.addAndUpdateTour = function (actionType) {
       return result;
     };
 
-    const fulldata = await req?.files?.map(async (item, i) => {
+    const fulldata = req?.files?.map(async (item, i) => {
       const fieldName = item.fieldname;
       if (item.fieldname.startsWith("images")) {
         // upload the image and send the link
@@ -118,8 +118,7 @@ exports.addAndUpdateTour = function (actionType) {
     });
 
     // stopping the code for image to uplaod and then send the response
-
-    const result = await Promise.all(fulldata);
+    await Promise.all(fulldata);
 
     // uplaod the document to database after everything is complete
 
