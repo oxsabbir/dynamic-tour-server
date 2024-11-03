@@ -14,13 +14,7 @@ app.use(express.json());
 // setting cookie parser
 app.use(cookieParser());
 
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    // Allow requests from this origin
-    // only for local development now
-  })
-);
+app.use(cors());
 // Defining required routes
 app.use("/api/v1/", authRouter);
 app.use("/api/v1/user", userRouter);

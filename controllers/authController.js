@@ -17,6 +17,7 @@ const generateToken = function (userId) {
 const sendCookie = function (res, name, val, options) {
   let cookieOption = {};
   if (!options) {
+    `  `;
     cookieOption.maxAge = 10000 * 60 * 10;
     cookieOption.httpOnly = true;
   }
@@ -31,6 +32,7 @@ exports.uploadSingle = upload.single("profileImage");
 // Sign up - Create new account
 exports.signUp = catchAsync(async function (req, res, next) {
   // validate the requestBody remove the role if user send it
+  console.log(req.body);
   let userData = req.body;
   if (!req.body.password || !req.body.confirmPassword)
     return next("Password is required");
