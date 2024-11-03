@@ -114,6 +114,7 @@ exports.addAndUpdateTour = function (actionType) {
               result?.secure_url,
             ]
           : [result?.secure_url];
+        newTour["images"] = [...newTour["images"], result?.secure_url];
       }
     });
 
