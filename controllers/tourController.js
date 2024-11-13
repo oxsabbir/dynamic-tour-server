@@ -11,9 +11,11 @@ exports.getAllTours = catchAsync(async function (req, res, next) {
   const filteredQuery = new ApplyFilter(userQuery, dataQuery)
     .filter()
     .query()
-    .page()
     .sort()
-    .limitField();
+    .limitField()
+    .page();
+
+  console.log(filteredQuery.total.countDocuments(), "hi");
 
   const allTour = await filteredQuery.dataQuery;
 
@@ -120,7 +122,6 @@ exports.addAndUpdateTour = function (actionType) {
 
     // stopping the code for image to uplaod and then send the response
     await Promise.all(fulldata);
-
     // uplaod the document to database after everything is complete
 
     let realData;

@@ -22,6 +22,8 @@ class ApplyFilter {
   query() {
     if (this.userQuery.query) {
       const searchQuery = this.userQuery?.query;
+      console.log();
+
       let escapedQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       this.dataQuery.find({
         title: { $regex: escapedQuery, $options: "i" },
@@ -31,9 +33,9 @@ class ApplyFilter {
   }
   page() {
     // default page would be 10 item per page
-    let perPage = this.userQuery?.limit || 10;
+    let perPage = this.userQuery?.limit || 12;
     let skip = this.userQuery.page * perPage - perPage;
-    this.dataQuery.limit(perPage).skip(skip);
+    this.dataQuery.limit(perPage).skip(skip || 0);
     return this;
   }
   sort() {
