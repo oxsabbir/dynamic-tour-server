@@ -24,6 +24,7 @@ process.on("uncaughtException", (err) => {
 // connecting to the database
 const DATABASE_URL = process.env.DATABASE;
 const DATABASE_PASSWORD = process.env.PASSWORD;
+const PORT = process.env.PORT || 4000;
 
 mongoose
   .connect(
@@ -36,10 +37,8 @@ mongoose
   .then(() => console.log("DATABASE CONNECTED SUCCESSFULLY"));
 
 // starting server
-const server = app.listen(process.env.PORT, "127.0.0.1", (res) => {
-  console.log(
-    `Server started at ${"localhost"} port number is : ${process.env.PORT}`
-  );
+const server = app.listen(PORT, "127.0.0.1", (res) => {
+  console.log(`Server started at ${"localhost"} port number is : ${PORT}`);
 });
 
 process.on("unhandledRejection", (err) => {
