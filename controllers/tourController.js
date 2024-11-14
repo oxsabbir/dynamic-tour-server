@@ -15,8 +15,6 @@ exports.getAllTours = catchAsync(async function (req, res, next) {
     .limitField()
     .page();
 
-  console.log(filteredQuery.total.countDocuments(), "hi");
-
   const allTour = await filteredQuery.dataQuery;
 
   res.status(200).json({
@@ -35,6 +33,7 @@ exports.addAndUpdateTour = function (actionType) {
   return catchAsync(async function (req, res, next) {
     // actionType === add ? means adding new tours
     // actionType === edit ? means editing existing tours
+    console.log(req.body, req?.files);
 
     const editableTourId = req.params?.tourId;
     // get the body data and filter it
@@ -118,10 +117,13 @@ exports.addAndUpdateTour = function (actionType) {
           : [result?.secure_url];
         newTour["images"] = [...newTour["images"], result?.secure_url];
       }
+      return true;
     });
 
     // stopping the code for image to uplaod and then send the response
-    await Promise.all(fulldata);
+    if (fulldata) {
+      await Promise.all(fulldata);
+    }
     // uplaod the document to database after everything is complete
 
     let realData;
