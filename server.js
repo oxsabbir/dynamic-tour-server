@@ -36,7 +36,7 @@ mongoose
   .then(() => console.log("DATABASE CONNECTED SUCCESSFULLY"));
 
 // starting server
-const server = app.listen(process.env.PORT, "127.0.0.1", () => {
+const server = app.listen(process.env.PORT, "127.0.0.1", (res) => {
   console.log(
     `Server started at ${"localhost"} port number is : ${process.env.PORT}`
   );
