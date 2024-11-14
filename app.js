@@ -15,22 +15,22 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(cors());
-// Defining required routes
-app.use("/api/v1/", authRouter);
-app.use("/api/v1/user", userRouter);
-app.use("/api/v1/tour", tourRouter);
-app.use("/api/v1/review", reviewRouter);
 
-// defining route for root route
-app.use("/", (req, res, next) => {
+app.get("/", (req, res, next) => {
   res.status(200).json({
     status: "success",
     message: "Server is up and running",
   });
 });
 
+// Defining required routes
+app.use("/api/v1/", authRouter);
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/tour", tourRouter);
+app.use("/api/v1/review", reviewRouter);
+
 // sending response for undefined route
-app.use("*", (req, res, next) => {
+app.all("*", (req, res, next) => {
   res.status(404).json({
     status: "not-found",
     message: `Cannot find ${req.originalUrl} on the server`,
@@ -38,7 +38,6 @@ app.use("*", (req, res, next) => {
 });
 
 // global error handling middleware
-
 app.use((err, req, res, next) => {
   console.log("error from global -", err);
   console.log(err);
