@@ -21,19 +21,19 @@ app.use("/api/v1/user", userRouter);
 app.use("/api/v1/tour", tourRouter);
 app.use("/api/v1/review", reviewRouter);
 
-// sending response for undefined route
-
-app.use("*", (req, res, next) => {
-  res.status(404).json({
-    status: "not-found",
-    message: `Cannot find ${req.originalUrl} on the server`,
-  });
-});
-
+// defining route for root route
 app.use("/", (req, res, next) => {
   res.status(200).json({
     status: "success",
     message: "Server is up and running",
+  });
+});
+
+// sending response for undefined route
+app.use("*", (req, res, next) => {
+  res.status(404).json({
+    status: "not-found",
+    message: `Cannot find ${req.originalUrl} on the server`,
   });
 });
 
