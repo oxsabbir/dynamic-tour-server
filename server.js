@@ -37,7 +37,7 @@ mongoose
   .then(() => console.log("DATABASE CONNECTED SUCCESSFULLY"));
 
 // starting server
-const server = app.listen(PORT, "127.0.0.1", (res) => {
+const server = app.listen(PORT, "0.0.0.0", (res) => {
   console.log(`Server started at ${"localhost"} port number is : ${PORT}`);
 });
 
