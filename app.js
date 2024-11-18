@@ -10,7 +10,7 @@ const reviewRouter = require("./routes/reviewRouter");
 const tourController = require("./controllers/tourController");
 // getting the http body data, Body parser
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true }));
 // setting cookie parser
 app.use(cookieParser());
 

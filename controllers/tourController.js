@@ -33,7 +33,7 @@ exports.addAndUpdateTour = function (actionType) {
   return catchAsync(async function (req, res, next) {
     // actionType === add ? means adding new tours
     // actionType === edit ? means editing existing tours
-    console.log(req.body, req?.files);
+    // console.log(req.body, req?.files);
 
     const editableTourId = req.params?.tourId;
     // get the body data and filter it
@@ -42,13 +42,18 @@ exports.addAndUpdateTour = function (actionType) {
     if (actionType === "add") {
       tourData = req.body;
     }
+
     if (actionType === "edit") {
       let editableTour = await Tour.findById(editableTourId);
-      const keys = Object.keys(req.body).forEach(
-        (item) => (editableTour[item] = req?.body[item])
-      );
+      const keys = Object.keys(req.body).forEach((item) => {
+        editableTour[item] = req?.body[item];
+      });
 
       tourData = editableTour;
+    }
+    // parsing the location data
+    if (typeof req.body?.locations === "string") {
+      tourData.locations = JSON.parse(req.body?.locations);
     }
 
     // creating newTour doucment will save it later down
@@ -99,6 +104,7 @@ exports.addAndUpdateTour = function (actionType) {
       }
       // get all the location image
       if (item.fieldname.startsWith("locations")) {
+        // console.log(newTour, "the tour");
         const result = await uploadByFolder(
           item.buffer,
           `tour/${newTour.id}/${item.fieldname}`,
@@ -106,6 +112,8 @@ exports.addAndUpdateTour = function (actionType) {
         );
 
         let locationIndex = +fieldName.slice(10, 11);
+        // console.log(newTour["locations"], "here i am ");
+        // console.log(locationIndex, "here i am ");
 
         newTour["locations"][locationIndex]["images"] = newTour["locations"][
           locationIndex
