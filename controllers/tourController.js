@@ -56,6 +56,9 @@ exports.addAndUpdateTour = function (actionType) {
       tourData.locations = JSON.parse(req.body?.locations);
     }
 
+    console.log(tourData, "the main data");
+    console.log(req.body?.locations, "the data");
+
     // creating newTour doucment will save it later down
     let newTour = new Tour(tourData);
     if (actionType === "edit") {
@@ -136,7 +139,7 @@ exports.addAndUpdateTour = function (actionType) {
 
     let realData;
     if (actionType === "add") {
-      realData = await newTour.save();
+      realData = await newTour.save({ validateBeforeSave: false });
     }
     if (actionType === "edit") {
       realData = await Tour.findByIdAndUpdate(editableTourId, newTour, {

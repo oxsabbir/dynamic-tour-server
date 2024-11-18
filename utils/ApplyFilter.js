@@ -41,7 +41,6 @@ class ApplyFilter {
   sort() {
     if (this.userQuery.sort) {
       const sortValue = this.userQuery.sort.split(",").join(" ");
-      console.log(sortValue);
       this.dataQuery.sort(sortValue);
     }
     return this;
