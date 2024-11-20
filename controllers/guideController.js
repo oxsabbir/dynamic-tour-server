@@ -51,6 +51,14 @@ exports.becomeGuide = catchAsync(async function (req, res, next) {
 
 exports.getPendingGuide = catchAsync(async function (req, res, next) {
   const pendingGuide = await User.find({ readyForGuide: true });
+  if (!pendingGuide) return next(new AppError("No pending guide found", 404));
+  res.status(200).json({
+    status: "success",
+    total: pendingGuide.length,
+    data: {
+      guide: pendingGuide,
+    },
+  });
 });
 
 exports.acceptGuide = catchAsync(async function (req, res, next) {

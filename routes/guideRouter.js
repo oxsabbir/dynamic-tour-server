@@ -14,20 +14,20 @@ router.get(
 router.get(
   "/pending",
   authController.routeProtect,
-  authController.authorise,
+  authController.authorise("admin"),
   guideController.getPendingGuide
 );
 
 router.post(
   "/accept/:id",
   authController.routeProtect,
-  authController.authorise,
+  authController.authorise("admin"),
   guideController.acceptGuide
 );
 router.post(
   "/reject/:id",
   authController.routeProtect,
-  authController.authorise,
+  authController.authorise("admin"),
   guideController.rejectGuide
 );
 
