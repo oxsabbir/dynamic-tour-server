@@ -6,13 +6,40 @@ const ApplyFilter = require("../utils/ApplyFilter");
 // to work with env variable
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
-
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 exports.bookTours = catchAsync(async function (req, res, next) {
-  const product = req.body?.product;
-  console.log("hi", product);
-  next();
+  const product = req.body;
+  console.log(product);
+
+  // line item for the item being proccessed
+  const lineItems = product?.map((item) => ({
+    price_data: {
+      currency: "usd",
+      product_data: {
+        name: item.name,
+        description: item?.description,
+        images: [item.image],
+      },
+      unit_amount: Math.round(item.price) * 100,
+    },
+    quantity: 1,
+  }));
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: lineItems,
+    mode: "payment",
+    success_url: "https://stripe.com/docs/error-codes/url-invalid",
+    cancel_url: "https://stripe.com/docs/error-codes/url-invalid",
+  });
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      session: session,
+    },
+  });
 });
 
 exports.getAllTours = catchAsync(async function (req, res, next) {

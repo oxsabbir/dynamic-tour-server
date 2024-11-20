@@ -3,7 +3,7 @@ const authController = require("../controllers/authController");
 const guideController = require("../controllers/guideController");
 const router = express.Router();
 
-router.route("/").get(authController.routeProtect, guideController.getAllGuide);
+router.route("/").get(guideController.getAllGuide);
 
 router.post(
   "/becomeGuide",
