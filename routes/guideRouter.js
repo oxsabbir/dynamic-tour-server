@@ -4,13 +4,6 @@ const guideController = require("../controllers/guideController");
 const router = express.Router();
 
 router.route("/").get(authController.routeProtect, guideController.getGuides);
-router
-  .route("/")
-  .delete(
-    authController.routeProtect,
-    authController.authorise("admin"),
-    guideController.deleteGuide
-  );
 
 router.get(
   "/becomeGuide",
@@ -37,5 +30,13 @@ router.post(
   authController.authorise("admin"),
   guideController.rejectGuide
 );
+
+router
+  .route("/:id")
+  .delete(
+    authController.routeProtect,
+    authController.authorise("admin"),
+    guideController.deleteGuide
+  );
 
 module.exports = router;

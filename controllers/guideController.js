@@ -87,8 +87,6 @@ exports.acceptGuide = catchAsync(async function (req, res, next) {
   });
 });
 
-exports.deleteGuide = catchAsync(async function (req, res, next) {});
-
 exports.rejectGuide = catchAsync(async function (req, res, next) {
   // the id of the guide to accept coming from params
   const guideId = req.params?.id;
@@ -109,6 +107,33 @@ exports.rejectGuide = catchAsync(async function (req, res, next) {
     message: "Successfully rejected guide request",
     data: {
       guide: rejectedGuide,
+    },
+  });
+});
+
+exports.deleteGuide = catchAsync(async function (req, res, next) {
+  const guideId = req.params?.id;
+  if (!guideId) return next(new AppError("No guide id found to delete", 404));
+
+  const deletedGuide = await User.findOneAndUpdate(
+    {
+      id: guideId,
+      readyForGuide: true,
+      role: { $eq: "guide" },
+    },
+    {
+      role: "user",
+      readyForGuide: false,
+    }
+  );
+
+  if (!deletedGuide) return next(new AppError("No guide found to delete", 404));
+
+  res.status(204).json({
+    status: "success",
+    message: "successfully deleted a guide",
+    data: {
+      guide: deletedGuide,
     },
   });
 });
