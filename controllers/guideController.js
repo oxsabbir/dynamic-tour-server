@@ -63,10 +63,49 @@ exports.getPendingGuide = catchAsync(async function (req, res, next) {
 
 exports.acceptGuide = catchAsync(async function (req, res, next) {
   // the id of the guide to accept coming from params
-  const pendingGuide = await User.find({ readyForGuide: true });
+  const guideId = req.params?.id;
+  if (!guideId) return next(new AppError("No guide id found", 404));
+  const acceptedGuide = await User.findOneAndUpdate(
+    { id: guideId, readyForGuide: false },
+    {
+      readyForGuide: true,
+      role: "guide",
+    },
+    { new: true }
+  );
+
+  if (!acceptedGuide)
+    return next(new AppError("No guide found to accept", 404));
+
+  res.status(200).json({
+    status: "success",
+    message: "Successfully accepted guide request",
+    data: {
+      guide: acceptedGuide,
+    },
+  });
 });
 
 exports.rejectGuide = catchAsync(async function (req, res, next) {
-  // the id of the guide to reject coming from params
-  const pendingGuide = await User.find({ readyForGuide: true });
+  // the id of the guide to accept coming from params
+  const guideId = req.params?.id;
+  if (!guideId) return next(new AppError("No guide id found", 404));
+  const rejectedGuide = await User.findOneAndUpdate(
+    { id: guideId, readyForGuide: true },
+    {
+      readyForGuide: false,
+    },
+    { new: true }
+  );
+
+  if (!rejectedGuide)
+    return next(new AppError("No guide found to reject", 404));
+
+  res.status(200).json({
+    status: "success",
+    message: "Successfully rejected guide request",
+    data: {
+      guide: rejectedGuide,
+    },
+  });
 });
