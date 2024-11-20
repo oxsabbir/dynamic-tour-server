@@ -32,12 +32,11 @@ const userSchema = new mongoose.Schema(
 
     role: {
       type: String,
-      enum: ["user", "guides", "admin"],
+      enum: ["user", "guide", "admin"],
       default: "user",
     },
     password: {
       type: String,
-      // require: [true, "A password is require to create an account"],
       min: [8, "A password require 6 or more character"],
     },
     passwordChangedAt: {
@@ -62,7 +61,7 @@ const userSchema = new mongoose.Schema(
       },
     },
     readyForGuide: {
-      type: String,
+      type: Boolean,
       default: false,
     },
 
