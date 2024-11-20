@@ -3,6 +3,17 @@ const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
 const { upload, uploadCloudinary } = require("../utils/uploadFiles");
 const ApplyFilter = require("../utils/ApplyFilter");
+// to work with env variable
+const dotenv = require("dotenv");
+dotenv.config({ path: "./config.env" });
+
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
+
+exports.bookTours = catchAsync(async function (req, res, next) {
+  const product = req.body?.product;
+  console.log("hi", product);
+  next();
+});
 
 exports.getAllTours = catchAsync(async function (req, res, next) {
   const userQuery = req.query;

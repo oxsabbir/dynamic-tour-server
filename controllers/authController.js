@@ -237,10 +237,9 @@ exports.updateProfile = catchAsync(async function (req, res, next) {
 
   // change the data in the database
 
-  const userData = await User.findByIdAndUpdate(
-    req.user?.id,
-    updatedData
-  ).select("-password -role -isActive");
+  const userData = await User.findByIdAndUpdate(req.user?.id, updatedData, {
+    new: true,
+  }).select("-password -role -isActive");
 
   if (!userData)
     return next(
