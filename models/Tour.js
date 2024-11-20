@@ -56,20 +56,7 @@ const tourSchema = new mongoose.Schema(
         images: [String],
       },
     ],
-
     duration: Number,
-
-    startLocation: {
-      type: {
-        type: String,
-        default: "Point",
-        enum: ["Point"],
-      },
-      coordinates: [Number],
-      address: String,
-      description: String,
-      images: [String],
-    },
 
     createdAt: {
       type: Date,
@@ -82,7 +69,6 @@ const tourSchema = new mongoose.Schema(
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
-
 tourSchema.index({ title: "text", description: "text" });
 
 // setting the virtual populate to show the review on the tour data
@@ -92,6 +78,12 @@ tourSchema.virtual("reviews", {
   localField: "_id",
   foreignField: "tour",
 });
+
+// creating the startLocation using the virtual Properties
+// tourSchema.virtual("startLocation").get(function () {
+//   if (this.locations.length < 1) return;
+//   return this.locations[0];
+// });
 
 // using document middleware to do some operation
 

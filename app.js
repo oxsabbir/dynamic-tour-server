@@ -7,7 +7,8 @@ const userRouter = require("./routes/userRouter");
 const authRouter = require("./routes/authRouter");
 const tourRouter = require("./routes/tourRouter");
 const reviewRouter = require("./routes/reviewRouter");
-const tourController = require("./controllers/tourController");
+const guideRouter = require("./routes/guideRouter");
+
 // getting the http body data, Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -26,6 +27,7 @@ app.get("/", (req, res, next) => {
 // Defining required routes
 app.use("/api/v1/", authRouter);
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/guide", guideRouter);
 app.use("/api/v1/tour", tourRouter);
 app.use("/api/v1/review", reviewRouter);
 

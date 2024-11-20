@@ -1,7 +1,7 @@
 const express = require("express");
 const userController = require("../controllers/userController");
 const authController = require("../controllers/authController");
-
+const guideController = require("../controllers/guideController");
 const router = express.Router();
 
 router
@@ -11,6 +11,9 @@ router
     authController.authorise("admin"),
     userController.getAllUser
   );
+router
+  .route("/guides")
+  .get(authController.routeProtect, guideController.getGuides);
 
 router
   .route("/:userId")

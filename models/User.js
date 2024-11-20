@@ -61,6 +61,10 @@ const userSchema = new mongoose.Schema(
         message: "Password didn't match",
       },
     },
+    readyForGuide: {
+      type: String,
+      default: false,
+    },
 
     createdAt: {
       type: Date,
