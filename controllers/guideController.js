@@ -4,7 +4,16 @@ const catchAsync = require("../utils/catchAsync");
 const User = require("../models/User");
 
 exports.getAllGuide = catchAsync(async function (req, res, next) {
-  const guide = await User.find({ role: "guide" }).select("-password");
+  const dataQuery = User.find({ role: "guide" }).select("-password");
+  const userQuery = req.query;
+
+  const filterGuide = new ApplyFilter(userQuery, dataQuery)
+    .filter()
+    .limitField()
+    .page()
+    .sort();
+
+  const guide = await filterGuide.dataQuery;
   if (!guide) return next(new AppError("No Guides Found", 404));
 
   res.status(200).json({
@@ -49,7 +58,6 @@ exports.becomeGuide = catchAsync(async function (req, res, next) {
     });
   }
   const price = req.body?.price;
-  console.log("priuce", price);
 
   if (!price)
     return next(new AppError("Please provide a price per people", 400));
