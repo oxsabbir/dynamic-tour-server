@@ -24,9 +24,16 @@ exports.becomeGuide = catchAsync(async function (req, res, next) {
       message: "Already applied to become a guide",
     });
   }
-
+  // check for if user is admin
+  if (req.user?.role === "admin") {
+    return res.status(200).json({
+      status: "success",
+      message: "An admin cannot become guide",
+    });
+  }
+  // changing the status for normal user
   const guide = await User.findByIdAndUpdate(
-    req.user?.id,
+    { id: req.user?.id },
     {
       readyForGuide: true,
     },
@@ -40,4 +47,18 @@ exports.becomeGuide = catchAsync(async function (req, res, next) {
       guide,
     },
   });
+});
+
+exports.getPendingGuide = catchAsync(async function (req, res, next) {
+  const pendingGuide = await User.find({ readyForGuide: true });
+});
+
+exports.acceptGuide = catchAsync(async function (req, res, next) {
+  // the id of the guide to accept coming from params
+  const pendingGuide = await User.find({ readyForGuide: true });
+});
+
+exports.rejectGuide = catchAsync(async function (req, res, next) {
+  // the id of the guide to reject coming from params
+  const pendingGuide = await User.find({ readyForGuide: true });
 });
