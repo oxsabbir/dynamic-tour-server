@@ -3,7 +3,7 @@ const authController = require("../controllers/authController");
 const guideController = require("../controllers/guideController");
 const router = express.Router();
 
-router.route("/").get(authController.routeProtect, guideController.getGuides);
+router.route("/").get(authController.routeProtect, guideController.getAllGuide);
 
 router.get(
   "/becomeGuide",
@@ -33,6 +33,7 @@ router.post(
 
 router
   .route("/:id")
+  .get(guideController.getGuide)
   .delete(
     authController.routeProtect,
     authController.authorise("admin"),

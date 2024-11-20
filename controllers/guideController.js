@@ -3,13 +3,28 @@ const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
 const User = require("../models/User");
 
-exports.getGuides = catchAsync(async function (req, res, next) {
+exports.getAllGuide = catchAsync(async function (req, res, next) {
   const guide = await User.find({ role: "guide" });
   if (!guide) return next(new AppError("No Guides Found", 404));
 
   res.status(200).json({
     status: "success",
     total: guide.length,
+    data: {
+      guide,
+    },
+  });
+});
+
+exports.getGuide = catchAsync(async function (req, res, next) {
+  const guideId = req.params?.id;
+  if (!guideId) return next(new AppError("no id for found for guide", 404));
+
+  const guide = await User.findOne({ role: "guide" });
+  if (!guide) return next(new AppError("No Guides Found", 404));
+
+  res.status(200).json({
+    status: "success",
     data: {
       guide,
     },

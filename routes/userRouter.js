@@ -11,9 +11,6 @@ router
     authController.authorise("admin"),
     userController.getAllUser
   );
-router
-  .route("/guides")
-  .get(authController.routeProtect, guideController.getGuides);
 
 router
   .route("/:userId")
