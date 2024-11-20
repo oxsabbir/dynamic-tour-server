@@ -4,7 +4,7 @@ const catchAsync = require("../utils/catchAsync");
 const User = require("../models/User");
 
 exports.getAllGuide = catchAsync(async function (req, res, next) {
-  const guide = await User.find({ role: "guide" });
+  const guide = await User.find({ role: "guide" }).select("-password");
   if (!guide) return next(new AppError("No Guides Found", 404));
 
   res.status(200).json({
@@ -20,7 +20,9 @@ exports.getGuide = catchAsync(async function (req, res, next) {
   const guideId = req.params?.id;
   if (!guideId) return next(new AppError("no id for found for guide", 404));
 
-  const guide = await User.findOne({ role: "guide" });
+  const guide = await User.findOne({ role: "guide", _id: guideId })
+    .select("-password")
+    .populate("reviews");
   if (!guide) return next(new AppError("No Guides Found", 404));
 
   res.status(200).json({
@@ -32,7 +34,6 @@ exports.getGuide = catchAsync(async function (req, res, next) {
 });
 
 exports.becomeGuide = catchAsync(async function (req, res, next) {
-  let response;
   // if already applied for guide
   if (req.user?.readyForGuide && req.user?.readyForGuide === true) {
     return res.status(200).json({
@@ -47,14 +48,20 @@ exports.becomeGuide = catchAsync(async function (req, res, next) {
       message: "Admin cannot become guide",
     });
   }
+  const price = req.body?.price;
+  console.log("priuce", price);
+
+  if (!price)
+    return next(new AppError("Please provide a price per people", 400));
   // changing the status for normal user
   const guide = await User.findByIdAndUpdate(
-    { id: req.user?.id },
+    { _id: req.user?.id },
     {
       readyForGuide: true,
+      price,
     },
     { new: true }
-  ).select("-password -passwordChangedAt ");
+  ).select("-password");
 
   res.status(200).json({
     status: "success",
@@ -66,7 +73,9 @@ exports.becomeGuide = catchAsync(async function (req, res, next) {
 });
 
 exports.getPendingGuide = catchAsync(async function (req, res, next) {
-  const pendingGuide = await User.find({ readyForGuide: true });
+  const pendingGuide = await User.find({ readyForGuide: true }).select(
+    "-password"
+  );
   if (!pendingGuide) return next(new AppError("No pending guide found", 404));
   res.status(200).json({
     status: "success",
@@ -82,13 +91,12 @@ exports.acceptGuide = catchAsync(async function (req, res, next) {
   const guideId = req.params?.id;
   if (!guideId) return next(new AppError("No guide id found", 404));
   const acceptedGuide = await User.findOneAndUpdate(
-    { id: guideId, readyForGuide: false },
+    { _id: guideId, readyForGuide: true, role: { $ne: "guide" } },
     {
-      readyForGuide: true,
       role: "guide",
     },
     { new: true }
-  );
+  ).select("-password");
 
   if (!acceptedGuide)
     return next(new AppError("No guide found to accept", 404));
@@ -106,13 +114,12 @@ exports.rejectGuide = catchAsync(async function (req, res, next) {
   // the id of the guide to accept coming from params
   const guideId = req.params?.id;
   if (!guideId) return next(new AppError("No guide id found", 404));
+  console.log(guideId);
   const rejectedGuide = await User.findOneAndUpdate(
-    { id: guideId, readyForGuide: true },
-    {
-      readyForGuide: false,
-    },
+    { _id: guideId, readyForGuide: true },
+    { readyForGuide: false },
     { new: true }
-  );
+  ).select("-password");
 
   if (!rejectedGuide)
     return next(new AppError("No guide found to reject", 404));
@@ -132,7 +139,7 @@ exports.deleteGuide = catchAsync(async function (req, res, next) {
 
   const deletedGuide = await User.findOneAndUpdate(
     {
-      id: guideId,
+      _id: guideId,
       readyForGuide: true,
       role: { $eq: "guide" },
     },

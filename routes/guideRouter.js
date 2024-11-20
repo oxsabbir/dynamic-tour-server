@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.route("/").get(authController.routeProtect, guideController.getAllGuide);
 
-router.get(
+router.post(
   "/becomeGuide",
   authController.routeProtect,
   guideController.becomeGuide

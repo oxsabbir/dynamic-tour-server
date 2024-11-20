@@ -64,6 +64,24 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    completedTour: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Tour",
+      },
+    ],
+
+    ratingAverage: Number,
+    reviews: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Review",
+        select: false,
+      },
+    ],
+    price: {
+      type: Number,
+    },
 
     createdAt: {
       type: Date,
