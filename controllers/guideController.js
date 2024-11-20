@@ -5,10 +5,11 @@ const User = require("../models/User");
 
 exports.getGuides = catchAsync(async function (req, res, next) {
   const guide = await User.find({ role: "guide" });
-  if (!guides) return next(new AppError("No Guides Found", 404));
+  if (!guide) return next(new AppError("No Guides Found", 404));
 
   res.status(200).json({
     status: "success",
+    total: guide.length,
     data: {
       guide,
     },
@@ -28,7 +29,7 @@ exports.becomeGuide = catchAsync(async function (req, res, next) {
   if (req.user?.role === "admin") {
     return res.status(200).json({
       status: "success",
-      message: "An admin cannot become guide",
+      message: "Admin cannot become guide",
     });
   }
   // changing the status for normal user
@@ -85,6 +86,8 @@ exports.acceptGuide = catchAsync(async function (req, res, next) {
     },
   });
 });
+
+exports.deleteGuide = catchAsync(async function (req, res, next) {});
 
 exports.rejectGuide = catchAsync(async function (req, res, next) {
   // the id of the guide to accept coming from params
