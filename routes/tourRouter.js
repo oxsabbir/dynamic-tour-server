@@ -33,9 +33,4 @@ router
     tourController.deleteTour
   );
 
-router.post(
-  "/create-checkout-session",
-  authController.routeProtect,
-  tourController.bookTours
-);
 module.exports = router;
