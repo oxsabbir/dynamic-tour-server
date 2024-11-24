@@ -31,9 +31,18 @@ class ApplyFilter {
     }
     return this;
   }
-  page() {
+  page(number) {
     // default page would be 10 item per page
-    let perPage = this.userQuery?.limit || 12;
+
+    let perPage;
+    if (this.userQuery?.limit) {
+      perPage = +this.userQuery?.limit;
+    } else if (number) {
+      perPage = number;
+    } else {
+      perPage = 12;
+    }
+
     let skip = this.userQuery.page * perPage - perPage;
     this.dataQuery.limit(perPage).skip(skip || 0);
     return this;

@@ -39,7 +39,7 @@ const reviewSchema = new mongoose.Schema(
 reviewSchema.pre(/^find/, function (next) {
   this.populate({
     path: "user",
-    select: "fullName profileImage firstName lastName",
+    select: "fullName profileImage userName",
   });
   next();
 });
@@ -90,7 +90,7 @@ reviewSchema.pre(/^findOneAnd/, async function (next) {
 
 reviewSchema.post(/^findOneAnd/, async function () {
   const tourId = this.currentDoc?.tour;
-  this.currentDoc.constructor.calculateRating(tourId);
+  this.currentDoc?.constructor.calculateRating(tourId);
 });
 
 const reviewModel = mongoose.model("Review", reviewSchema);

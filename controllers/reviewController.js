@@ -1,16 +1,23 @@
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
 const Review = require("../models/Review");
+const ApplyFilter = require("../utils/ApplyFilter");
 
 exports.getAllReview = catchAsync(async function (req, res, next) {
   const tourId = req.params?.tourId;
-
-  const review = await Review.find(tourId ? { tour: tourId } : null);
+  const filteredTour = new ApplyFilter(
+    req.query,
+    Review.find(tourId ? { tour: tourId } : null)
+  )
+    .sort()
+    .page(6);
+  const review = await filteredTour.dataQuery;
 
   res.status(200).json({
     status: "success",
     message: "Retrive review successfully",
     result: review?.length,
+
     data: {
       review,
     },
