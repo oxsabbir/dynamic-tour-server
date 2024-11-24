@@ -19,10 +19,21 @@ exports.getAllTours = catchAsync(async function (req, res, next) {
     .limitField()
     .page();
 
+  const totalItem = await Tour.find().countDocuments();
+  const totalPage = totalItem / (req.query?.limit ? +req.query?.limit : 12);
+
+  const pagination = {
+    currentPage: +req.query?.page,
+    totalItem,
+    totalPage: Math.ceil(totalPage),
+  };
+
   const allTour = await filteredQuery.dataQuery;
 
   res.status(200).json({
     status: "success",
+    message: "Tour retrive successfully",
+    pagination,
     data: {
       total: allTour.length,
       tour: allTour,
