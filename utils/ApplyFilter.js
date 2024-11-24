@@ -22,8 +22,6 @@ class ApplyFilter {
   query() {
     if (this.userQuery.query) {
       const searchQuery = this.userQuery?.query;
-      console.log();
-
       let escapedQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       this.dataQuery.find({
         title: { $regex: escapedQuery, $options: "i" },
@@ -47,6 +45,7 @@ class ApplyFilter {
     this.dataQuery.limit(perPage).skip(skip || 0);
     return this;
   }
+
   sort() {
     if (this.userQuery.sort) {
       const sortValue = this.userQuery.sort.split(",").join(" ");
