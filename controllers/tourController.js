@@ -10,8 +10,8 @@ exports.getAllTours = catchAsync(async function (req, res, next) {
   const dataQuery = Tour.find();
 
   const filteredQuery = new ApplyFilter(userQuery, dataQuery)
+    .query("title")
     .filter()
-    .query()
     .sort()
     .limitField();
 

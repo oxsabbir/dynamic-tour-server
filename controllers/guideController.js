@@ -8,6 +8,7 @@ exports.getAllGuide = catchAsync(async function (req, res, next) {
   const userQuery = req.query;
 
   const filterGuide = new ApplyFilter(userQuery, dataQuery)
+    .query("fullName")
     .filter()
     .limitField()
     .page()
