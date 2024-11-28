@@ -1,10 +1,10 @@
+const dotenv = require("dotenv").config({ path: "./config.env" });
+
 const app = require("./app");
-const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const cloudinary = require("cloudinary").v2;
 
 // configuring environtment variable
-dotenv.config({ path: "./config.env" });
 
 // configuring cloudinary
 

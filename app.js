@@ -10,13 +10,12 @@ const reviewRouter = require("./routes/reviewRouter");
 const guideRouter = require("./routes/guideRouter");
 const bookingRouter = require("./routes/bookingRouter");
 
+app.use(cors());
 // getting the http body data, Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // setting cookie parser
 app.use(cookieParser());
-
-app.use(cors());
 
 app.get("/", (req, res, next) => {
   res.status(200).json({

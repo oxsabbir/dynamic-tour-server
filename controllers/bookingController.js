@@ -3,9 +3,7 @@ const Booking = require("../models/Booking");
 const Tour = require("../models/Tour");
 const User = require("../models/User");
 const AppError = require("../utils/AppError");
-// to work with env variable
-const dotenv = require("dotenv");
-dotenv.config({ path: "./config.env" });
+
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 exports.getCheckoutSession = catchAsync(async function (req, res, next) {

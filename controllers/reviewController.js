@@ -3,9 +3,6 @@ const catchAsync = require("../utils/catchAsync");
 const Review = require("../models/Review");
 const ApplyFilter = require("../utils/ApplyFilter");
 const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv");
-
-dotenv.config({ path: "./config.env" });
 
 exports.getAllReview = catchAsync(async function (req, res, next) {
   const tourId = req.params?.tourId;
