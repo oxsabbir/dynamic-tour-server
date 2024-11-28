@@ -35,6 +35,7 @@ exports.getAllReview = catchAsync(async function (req, res, next) {
     result: review?.length,
     data: {
       authReview,
+
       review,
     },
   });
