@@ -2,23 +2,39 @@ const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
 const Review = require("../models/Review");
 const ApplyFilter = require("../utils/ApplyFilter");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+
+dotenv.config({ path: "./config.env" });
 
 exports.getAllReview = catchAsync(async function (req, res, next) {
   const tourId = req.params?.tourId;
-  const filteredTour = new ApplyFilter(
-    req.query,
-    Review.find(tourId ? { tour: tourId } : null)
-  )
+
+  const token = req.headers?.authorization?.split(" ");
+  const decoded = token && jwt.verify(token[1], process.env.JWT_SECRET);
+
+  const authReview =
+    decoded?.id && (await Review.findOne({ user: decoded.id, tour: tourId }));
+
+  let searchQuery = {};
+  if (tourId && !authReview?.user) {
+    searchQuery = { tour: tourId };
+  } else if (tourId && authReview?.user) {
+    searchQuery = { tour: tourId, user: { $ne: authReview?.user.id } };
+  }
+
+  const filteredTour = new ApplyFilter(req.query, Review.find(searchQuery))
     .sort()
     .page(6);
+
   const review = await filteredTour.dataQuery;
 
   res.status(200).json({
     status: "success",
     message: "Retrive review successfully",
     result: review?.length,
-
     data: {
+      authReview,
       review,
     },
   });

@@ -17,7 +17,6 @@ exports.getAllGuide = catchAsync(async function (req, res, next) {
 
   const totalPage = totalItem / (req.query?.limit ? +req.query?.limit : 3);
 
-  console.log(req.query);
   const pagination = {
     currentPage: +req.query?.page || 1,
     totalItem,

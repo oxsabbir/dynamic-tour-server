@@ -38,6 +38,27 @@ exports.getAllTours = catchAsync(async function (req, res, next) {
   });
 });
 
+exports.getTour = catchAsync(async function (req, res, next) {
+  const id = req.params?.tourId;
+
+  if (!id) return next(new AppError("No tour id found", 404));
+  const tour = await Tour.findById(id)
+    .select("+createdAt")
+    .populate([
+      { path: "guides", select: "-password -role" },
+      // { path: "reviews" },
+    ]);
+
+  if (!tour) return next(new AppError("No tour found", 404));
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      tour,
+    },
+  });
+});
+
 // upload middleware
 exports.uploadFields = upload.any();
 
@@ -172,28 +193,6 @@ exports.addAndUpdateTour = function (actionType) {
     });
   });
 };
-
-exports.getTour = catchAsync(async function (req, res, next) {
-  const id = req.params?.tourId;
-  console.log(req.headers);
-
-  if (!id) return next(new AppError("No tour id found", 404));
-  const tour = await Tour.findById(id)
-    .select("+createdAt")
-    .populate([
-      { path: "guides", select: "-password -role" },
-      { path: "reviews" },
-    ]);
-
-  if (!tour) return next(new AppError("No tour found", 404));
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      tour,
-    },
-  });
-});
 
 exports.deleteTour = catchAsync(async function (req, res, next) {
   let id = req.params?.tourId;
