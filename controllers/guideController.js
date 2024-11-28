@@ -7,20 +7,31 @@ exports.getAllGuide = catchAsync(async function (req, res, next) {
   const dataQuery = User.find({ role: "guide" }).select("-password");
   const userQuery = req.query;
 
-  const filterGuide = new ApplyFilter(userQuery, dataQuery)
+  const filteredQuery = new ApplyFilter(userQuery, dataQuery)
     .query("fullName")
     .filter()
-    .limitField()
-    .page()
-    .sort();
+    .sort()
+    .limitField();
 
-  const guide = await filterGuide.dataQuery;
-  if (!guide) return next(new AppError("No Guides Found", 404));
+  const totalItem = await filteredQuery.dataQuery.clone().countDocuments();
+
+  const totalPage = totalItem / (req.query?.limit ? +req.query?.limit : 3);
+
+  console.log(req.query);
+  const pagination = {
+    currentPage: +req.query?.page || 1,
+    totalItem,
+    totalPage: Math.ceil(totalPage),
+  };
+
+  const guide = await filteredQuery.page(3).dataQuery;
 
   res.status(200).json({
     status: "success",
-    total: guide.length,
+    message: "Guides retrive successfully",
+    pagination,
     data: {
+      total: guide.length,
       guide,
     },
   });

@@ -20,7 +20,7 @@ exports.getAllTours = catchAsync(async function (req, res, next) {
   const totalPage = totalItem / (req.query?.limit ? +req.query?.limit : 12);
 
   const pagination = {
-    currentPage: +req.query?.page,
+    currentPage: +req.query?.page || 1,
     totalItem,
     totalPage: Math.ceil(totalPage),
   };
