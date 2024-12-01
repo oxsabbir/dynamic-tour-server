@@ -9,6 +9,6 @@ router.get(
   bookingController.getCheckoutSession
 );
 
-router.get("/", authController.routeProtect, bookingController.createBooking);
+router.get("/", bookingController.createBooking);
 
 module.exports = router;
