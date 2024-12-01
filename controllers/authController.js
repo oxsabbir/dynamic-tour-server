@@ -331,10 +331,26 @@ exports.changePassword = catchAsync(async function (req, res, next) {
 
 // sign in using google
 exports.signInWithGoogle = catchAsync(async function (req, res, next) {
-  // creating user
+  // creating username using recurtion function
+  const generateUserName = async function (firstName) {
+    // username should start with the firstname
+    const randomNumber = Math.floor(Math.random() * (10000 - 10 + 1)) + 10;
+    const uniqueUserName = `${firstName}${randomNumber.toString()}`;
+    const userExist = await User.findOne({ userName: uniqueUserName });
+
+    // if user found with the generated userName
+    if (userExist) {
+      generateUserName(firstName);
+    } else {
+      console.log("non-recursive");
+    }
+    // check if already username exist or not
+  };
+
   const createGoogleUser = async function (userInfo) {
+    const userName = await generateUserName(userInfo.fullName.split(" ")[0]);
+    userInfo.userName = userName;
     const newUser = await User.create(userInfo);
-    console.log(newUser);
     const token = generateToken(newUser.id);
     res.status(200).json({
       status: "success",
