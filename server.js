@@ -38,8 +38,7 @@ mongoose
   )
   .then(() => console.log("DATABASE CONNECTED SUCCESSFULLY"));
 
-const endpointSecret =
-  "whsec_d53642d79b2c5a283c7c547ebeb2d6b6d198fc3e8ccf97fb4b13d5179905bf65";
+const endpointSecret = process.env.WEB_HOOK_SECRET;
 const defaultWebhook = async function () {};
 
 app.post(
