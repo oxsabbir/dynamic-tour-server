@@ -11,6 +11,7 @@ router
     authController.authorise("admin"),
     userController.getAllUser
   );
+router.route("/username/:userName").get(userController.getUserByUserName);
 
 router
   .route("/:userId")
