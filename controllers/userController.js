@@ -21,7 +21,6 @@ exports.getUserByUserName = catchAsync(async function (req, res, next) {
   const user = await User.findOne({ userName }).select(
     "-password -__v -createdAt -email "
   );
-  console.log(user);
   if (!user) return next(new AppError("No user found", 404));
   res.status(200).json({
     status: "success",

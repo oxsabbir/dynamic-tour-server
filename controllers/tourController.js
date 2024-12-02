@@ -38,6 +38,28 @@ exports.getAllTours = catchAsync(async function (req, res, next) {
   });
 });
 
+exports.getToursByType = catchAsync(async function (req, res, next) {
+  const type = req.query?.type;
+  const userId = req.query?.userId;
+  if (!type || !userId) return next(new AppError("No type user found", 404));
+  let tours;
+  switch (type) {
+    case type === "upcoming": {
+      break;
+    }
+    case type === "completed": {
+      break;
+    }
+    case type === "review": {
+      break;
+    }
+    default: {
+      tours = null;
+    }
+  }
+  if (!tours) return next(new AppError("No tour found", 404));
+});
+
 exports.getTour = catchAsync(async function (req, res, next) {
   const id = req.params?.tourId;
 

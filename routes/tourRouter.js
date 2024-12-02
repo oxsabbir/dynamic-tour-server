@@ -16,6 +16,8 @@ router
     tourController.addAndUpdateTour("add")
   );
 
+router.route("/bytype", tourController.getToursByType);
+
 router.use("/:tourId/review", reviewRouter);
 
 router
