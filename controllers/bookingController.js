@@ -48,8 +48,12 @@ exports.getCheckoutSession = catchAsync(async function (req, res, next) {
     payment_method_types: ["card"],
     line_items: lineItems,
     mode: "payment",
-    success_url: `${process.env.CLIENT_URL_LOCAL}`,
+    success_url: `${process.env.CLIENT_URL}`,
     cancel_url: `${req.protocol}://${req.get("host")}/tour/${product[0]?.tourId}`,
+    metadata: {
+      tour_id: tourId, // Adding custom metadata (tour ID)
+      user_id: req.user.id, // Adding custom metadata (user ID)
+    },
   });
 
   res.status(201).json({
@@ -62,7 +66,6 @@ exports.getCheckoutSession = catchAsync(async function (req, res, next) {
 
 exports.getEventResponse = catchAsync(async function (request, response, next) {
   const endpointSecret = process.env.WEB_HOOK_SECRET;
-  console.log("okay cli");
 
   const sig = request.headers["stripe-signature"];
   let event;
@@ -77,7 +80,6 @@ exports.getEventResponse = catchAsync(async function (request, response, next) {
     return;
   }
 
-  console.log(event);
   // Handle the event
   switch (event.type) {
     case "checkout.session.async_payment_failed":
@@ -93,11 +95,19 @@ exports.getEventResponse = catchAsync(async function (request, response, next) {
       break;
     case "checkout.session.completed":
       const checkoutSessionCompleted = event.data.object;
-      console.log(checkoutSessionCompleted);
+      console.log("-----------comeplete", checkoutSessionCompleted);
       console.log("complete");
+
+      // get the userid , tourid, and the price from completed session
 
       // Then define and call a function to handle the event checkout.session.completed
       break;
+
+    case "charge.updated":
+      const chargeUpdated = event.data.object;
+      console.log(chargeUpdated.receipt_url);
+      break;
+
     case "checkout.session.expired":
       const checkoutSessionExpired = event.data.object;
       // Then define and call a function to handle the event checkout.session.expired
