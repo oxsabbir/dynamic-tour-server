@@ -3,7 +3,6 @@ const Booking = require("../models/Booking");
 const Tour = require("../models/Tour");
 const User = require("../models/User");
 const AppError = require("../utils/AppError");
-
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 exports.getCheckoutSession = catchAsync(async function (req, res, next) {
@@ -21,7 +20,7 @@ exports.getCheckoutSession = catchAsync(async function (req, res, next) {
     },
     {
       name: selectedGuide?.fullName,
-      image: tourData?.coverImage,
+      image: selectedGuide?.profileImage,
       price: selectedGuide?.price,
       description: "Guides Fee",
     },
@@ -41,13 +40,15 @@ exports.getCheckoutSession = catchAsync(async function (req, res, next) {
     quantity: 1,
   }));
 
+  // ${req.protocol}://${req.get("host")}/api/v1/booking?tour=${product[0]?.tourId}&user=${
+  //     req.user.id
+  //   }&price=${product[0]?.price}
+
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
     line_items: lineItems,
     mode: "payment",
-    success_url: `${req.protocol}://${req.get("host")}/api/v1/booking?tour=${product[0]?.tourId}&user=${
-      req.user.id
-    }&price=${product[0]?.price}`,
+    success_url: `${process.env.CLIENT_URL_LOCAL}`,
     cancel_url: `${req.protocol}://${req.get("host")}/tour/${product[0]?.tourId}`,
   });
 
@@ -57,6 +58,57 @@ exports.getCheckoutSession = catchAsync(async function (req, res, next) {
       session: session,
     },
   });
+});
+
+exports.getEventResponse = catchAsync(async function (request, response, next) {
+  const endpointSecret = process.env.WEB_HOOK_SECRET;
+  console.log("okay cli");
+
+  const sig = request.headers["stripe-signature"];
+  let event;
+  console.log(
+    stripe.webhooks.constructEvent(request.body, sig, endpointSecret)
+  );
+
+  try {
+    event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+  } catch (err) {
+    response.status(400).send(`Webhook Error: ${err.message}`);
+    return;
+  }
+
+  console.log(event);
+  // Handle the event
+  switch (event.type) {
+    case "checkout.session.async_payment_failed":
+      console.log("failed");
+      const checkoutSessionAsyncPaymentFailed = event.data.object;
+      // Then define and call a function to handle the event checkout.session.async_payment_failed
+      break;
+    case "checkout.session.async_payment_succeeded":
+      const checkoutSessionAsyncPaymentSucceeded = event.data.object;
+      console.log("success");
+      console.log(event.data.object);
+      // Then define and call a function to handle the event checkout.session.async_payment_succeeded
+      break;
+    case "checkout.session.completed":
+      const checkoutSessionCompleted = event.data.object;
+      console.log(checkoutSessionCompleted);
+      console.log("complete");
+
+      // Then define and call a function to handle the event checkout.session.completed
+      break;
+    case "checkout.session.expired":
+      const checkoutSessionExpired = event.data.object;
+      // Then define and call a function to handle the event checkout.session.expired
+      break;
+    // ... handle other event types
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+  // Return a 200 response to acknowledge receipt of the event
+  response.send();
 });
 
 exports.createBooking = catchAsync(async function (req, res, next) {

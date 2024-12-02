@@ -9,10 +9,11 @@ const tourRouter = require("./routes/tourRouter");
 const reviewRouter = require("./routes/reviewRouter");
 const guideRouter = require("./routes/guideRouter");
 const bookingRouter = require("./routes/bookingRouter");
+const webhookMethod =
+  require("./controllers/bookingController").getEventResponse;
 
 app.use(cors());
 // getting the http body data, Body parser
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // setting cookie parser
 app.use(cookieParser());
@@ -24,6 +25,13 @@ app.get("/", (req, res, next) => {
   });
 });
 
+app.post(
+  "/stripe-webhook",
+  express.raw({ type: "application/json" }),
+  webhookMethod
+);
+
+app.use(express.json());
 // Defining required routes
 app.use("/api/v1/", authRouter);
 app.use("/api/v1/user", userRouter);
