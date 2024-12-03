@@ -9,13 +9,13 @@
 const ApplyFilter = require("./ApplyFilter");
 
 const FilterAndPaginate = async function (
-  DataModel,
+  findQuery,
   request,
   searchField,
   limit = 12
 ) {
   const userQuery = request.query;
-  const dataQuery = DataModel.find();
+  const dataQuery = findQuery;
 
   const filteredQuery = new ApplyFilter(userQuery, dataQuery)
     .query(searchField)
@@ -34,7 +34,7 @@ const FilterAndPaginate = async function (
     totalPage: Math.ceil(totalPage),
   };
 
-  const dataList = await filteredQuery.page().dataQuery;
+  const dataList = await filteredQuery.page(limit).dataQuery;
 
   // return pagination object and allResource
   return {

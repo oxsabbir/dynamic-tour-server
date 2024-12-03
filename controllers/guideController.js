@@ -3,35 +3,19 @@ const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
 const User = require("../models/User");
 
+const FilterAndPaginate = require("../utils/FilterAndPaginate");
+
 exports.getAllGuide = catchAsync(async function (req, res, next) {
-  const dataQuery = User.find({ role: "guide" }).select("-password");
-  const userQuery = req.query;
-
-  const filteredQuery = new ApplyFilter(userQuery, dataQuery)
-    .query("fullName")
-    .filter()
-    .sort()
-    .limitField();
-
-  const totalItem = await filteredQuery.dataQuery.clone().countDocuments();
-
-  const totalPage = totalItem / (req.query?.limit ? +req.query?.limit : 3);
-
-  const pagination = {
-    currentPage: +req.query?.page || 1,
-    totalItem,
-    totalPage: Math.ceil(totalPage),
-  };
-
-  const guide = await filteredQuery.page(3).dataQuery;
+  const findQuery = User.find({ role: "guide" }).select("-password");
+  const guideData = await FilterAndPaginate(findQuery, req, "fullName", 3);
 
   res.status(200).json({
     status: "success",
     message: "Guides retrive successfully",
-    pagination,
+    pagination: guideData.pagination,
     data: {
-      total: guide.length,
-      guide,
+      total: guideData.dataList.length,
+      guide: guideData.dataList,
     },
   });
 });

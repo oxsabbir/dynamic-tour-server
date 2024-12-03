@@ -18,6 +18,11 @@ const userSchema = new mongoose.Schema(
       max: [25, "Cannot have more then 25 character for username"],
       min: [3, "Cannout have lesser then 3 character for username"],
     },
+    bio: {
+      type: String,
+      require: [true, "A unique username is require"],
+      max: [160, "Cannot have more then 160 character for bio"],
+    },
     email: {
       type: String,
       require: [true, "Please provide an email address"],

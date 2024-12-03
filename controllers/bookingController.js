@@ -6,7 +6,33 @@ const AppError = require("../utils/AppError");
 const FilterAndPaginate = require("../utils/FilterAndPaginate");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
-exports.getAllBookings = catchAsync(async function (req, res, next) {});
+exports.getAllBookings = catchAsync(async function (req, res, next) {
+  const findQuery = Booking.find()
+    .populate({
+      path: "user",
+      select: "fullName profileImage userName",
+    })
+    .populate({
+      path: "tour",
+      select: "title coverImage price ratingsAverage",
+    })
+    .populate({
+      path: "guide",
+      select: "fullName profileImage price userName",
+    });
+
+  const mainData = await FilterAndPaginate(findQuery, req, "price", 12);
+
+  res.status(200).json({
+    status: "success",
+    message: "Bookings retrive successfully",
+    pagination: mainData.pagination,
+    data: {
+      total: mainData.dataList.length,
+      tour: mainData.dataList,
+    },
+  });
+});
 
 exports.getCheckoutSession = catchAsync(async function (req, res, next) {
   const { tourId, guideId, startDate } = req.params;
