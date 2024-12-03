@@ -6,7 +6,10 @@ const AppError = require("../utils/AppError");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 exports.getCheckoutSession = catchAsync(async function (req, res, next) {
-  const { tourId, guideId } = req.params;
+  const { tourId, guideId, startDate } = req.params;
+  if (!tourId || !guideId || !startDate)
+    return next(new AppError("No tourId or guideId or startDate found", 404));
+
   const tourData = await Tour.findById(tourId);
   const selectedGuide = await User.findById(guideId).select("-password");
 
@@ -51,8 +54,10 @@ exports.getCheckoutSession = catchAsync(async function (req, res, next) {
     success_url: `${process.env.CLIENT_URL}`,
     cancel_url: `${req.protocol}://${req.get("host")}/tour/${product[0]?.tourId}`,
     metadata: {
+      guide_id: selectedGuide.id,
       tour_id: tourId, // Adding custom metadata (tour ID)
       user_id: req.user.id, // Adding custom metadata (user ID)
+      start_date: startDate,
     },
   });
 
@@ -66,6 +71,28 @@ exports.getCheckoutSession = catchAsync(async function (req, res, next) {
 
 exports.getEventResponse = catchAsync(async function (request, response, next) {
   const endpointSecret = process.env.WEB_HOOK_SECRET;
+
+  const createBooking = async function (
+    tourId,
+    guideId,
+    userId,
+    price,
+    startDate
+  ) {
+    // checking if  tourid guideid userid price these field are there
+    if (!tourId || !userId || !guideId || !price || !startDate)
+      return next(new AppError("Some require information is missing", 400));
+    // create booking
+    const booking = await Booking.create({
+      tour: tourId,
+      guide: guideId,
+      user: userId,
+      price: price,
+      startDate: startDate,
+    });
+
+    console.log(booking);
+  };
 
   const sig = request.headers["stripe-signature"];
   let event;
@@ -96,7 +123,16 @@ exports.getEventResponse = catchAsync(async function (request, response, next) {
     case "checkout.session.completed":
       const checkoutSessionCompleted = event.data.object;
       console.log("-----------comeplete", checkoutSessionCompleted);
-      console.log("complete");
+      const price = checkoutSessionCompleted.amount_total / 100;
+      const metaData = checkoutSessionCompleted.metadata;
+
+      const bookingDetails = await createBooking(
+        metaData.tour_id,
+        metaData.guide_id,
+        metaData.user_id,
+        price,
+        metaData.start_date
+      );
 
       // get the userid , tourid, and the price from completed session
 

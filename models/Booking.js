@@ -12,13 +12,18 @@ const bookingSchema = new mongoose.Schema(
       ref: "User",
       require: [true, "A booking must have a user id"],
     },
+    guide: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+      require: [true, "A booking must have a guide id"],
+    },
+    startDate: {
+      type: Date,
+      require: [true, "A booking must have a data"],
+    },
     price: {
       type: Number,
       require: [true, "A booking must have a price"],
-    },
-    tourDate: {
-      type: Date,
-      require: [true, "A booking must have a data"],
     },
     createdAt: {
       type: Date,
