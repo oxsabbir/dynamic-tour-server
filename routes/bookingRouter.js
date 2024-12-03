@@ -5,6 +5,10 @@ const router = express.Router();
 router.get("/", bookingController.getAllBookings);
 
 router.get("/retrive-session/:sessionId", bookingController.getPaymentSession);
+router.get(
+  "/booking-by-user/:userName/:filterValue",
+  bookingController.getUserBooking
+);
 
 router.get(
   "/create-checkout-session/:tourId/:guideId/:startDate",

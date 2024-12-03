@@ -7,25 +7,59 @@ const FilterAndPaginate = require("../utils/FilterAndPaginate");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 exports.getAllBookings = catchAsync(async function (req, res, next) {
-  const findQuery = Booking.find()
-    .populate({
-      path: "user",
-      select: "fullName profileImage userName",
-    })
-    .populate({
-      path: "tour",
-      select: "title coverImage price ratingsAverage",
-    })
-    .populate({
-      path: "guide",
-      select: "fullName profileImage price userName",
-    });
+  const findQuery = Booking.find();
 
   const mainData = await FilterAndPaginate(
     findQuery,
     req,
     "price",
     12,
+    next,
+    "Bookings"
+  );
+
+  res.status(200).json({
+    status: "success",
+    message: "Bookings retrive successfully",
+    pagination: mainData.pagination,
+    data: {
+      total: mainData.dataList.length,
+      tour: mainData.dataList,
+    },
+  });
+});
+
+exports.getUserBooking = catchAsync(async function (req, res, next) {
+  const userName = req.params.userName;
+  const filterValue = req.params.filterValue;
+  if (!filterValue || !userName)
+    return next(new AppError("Username or filtervalue not found", 404));
+
+  const userId = await User.findOne({ userName: userName }).select("_id");
+  // complete means startDate > currentDate
+  // upcoming means startDate < currentDate
+  // review means startDate > currentDate || not reviewed
+  const date = new Date();
+  let filterObject = {};
+
+  if (filterValue === "complete") {
+    filterObject = filterObject.startDate = { $gt: date };
+  } else if (filterValue === "upcoming") {
+    filterObject = filterObject.startDate = { $lt: date };
+  } else if (filterValue === "review") {
+    filterObject = filterObject.startDate = { $lt: date };
+  }
+
+  const findQuery = Booking.find({
+    user: userId.id,
+    filterObject,
+  });
+
+  const mainData = await FilterAndPaginate(
+    findQuery,
+    req,
+    "price",
+    6,
     next,
     "Bookings"
   );
@@ -102,7 +136,7 @@ exports.getCheckoutSession = catchAsync(async function (req, res, next) {
     line_items: lineItems,
     mode: "payment",
     success_url: `${process.env.CLIENT_URL}/order-success/{CHECKOUT_SESSION_ID}`,
-    cancel_url: `${req.protocol}://${req.get("host")}/tour/${product[0]?.tourId}`,
+    cancel_url: `${process.env.CLIENT_URL}/order-failed/{CHECKOUT_SESSION_ID}`,
     metadata: {
       guide_id: selectedGuide.id,
       tour_id: tourId, // Adding custom metadata (tour ID)
@@ -172,7 +206,6 @@ exports.getEventResponse = catchAsync(async function (request, response, next) {
       break;
     case "checkout.session.completed":
       const checkoutSessionCompleted = event.data.object;
-      console.log("-----------comeplete", checkoutSessionCompleted);
       const price = checkoutSessionCompleted.amount_total / 100;
       const metaData = checkoutSessionCompleted.metadata;
 

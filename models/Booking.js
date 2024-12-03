@@ -33,6 +33,22 @@ const bookingSchema = new mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+bookingSchema.pre(/^find/, async function (next) {
+  this.populate({
+    path: "user",
+    select: "fullName profileImage userName",
+  })
+    .populate({
+      path: "tour",
+      select: "title coverImage price ratingsAverage",
+    })
+    .populate({
+      path: "guide",
+      select: "fullName profileImage price userName",
+    });
+  next();
+});
+
 const bookingModel = mongoose.model("Booking", bookingSchema);
 
 module.exports = bookingModel;
