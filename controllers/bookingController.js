@@ -39,20 +39,22 @@ exports.getUserBooking = catchAsync(async function (req, res, next) {
   // complete means startDate > currentDate
   // upcoming means startDate < currentDate
   // review means startDate > currentDate || not reviewed
+  //
+
   const date = new Date();
-  let filterObject = {};
+  let filterObject;
 
   if (filterValue === "complete") {
-    filterObject = filterObject.startDate = { $gt: date };
+    filterObject = { $lt: date };
   } else if (filterValue === "upcoming") {
-    filterObject = filterObject.startDate = { $lt: date };
+    filterObject = { $gt: date };
   } else if (filterValue === "review") {
-    filterObject = filterObject.startDate = { $lt: date };
+    filterObject.startDate = { $lt: date };
   }
 
   const findQuery = Booking.find({
     user: userId.id,
-    filterObject,
+    startDate: filterObject,
   });
 
   const mainData = await FilterAndPaginate(
@@ -70,7 +72,7 @@ exports.getUserBooking = catchAsync(async function (req, res, next) {
     pagination: mainData.pagination,
     data: {
       total: mainData.dataList.length,
-      tour: mainData.dataList,
+      booking: mainData.dataList,
     },
   });
 });
