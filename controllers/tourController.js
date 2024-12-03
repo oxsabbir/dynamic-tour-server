@@ -10,7 +10,14 @@ const FilterAndPaginate = require("../utils/FilterAndPaginate");
 
 exports.getAllTours = catchAsync(async function (req, res, next) {
   const findQuery = Tour.find();
-  const mainData = await FilterAndPaginate(findQuery, req, "title", 12);
+  const mainData = await FilterAndPaginate(
+    findQuery,
+    req,
+    "title",
+    12,
+    next,
+    "Tours"
+  );
 
   res.status(200).json({
     status: "success",

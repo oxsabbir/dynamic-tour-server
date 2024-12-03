@@ -7,7 +7,14 @@ const FilterAndPaginate = require("../utils/FilterAndPaginate");
 
 exports.getAllGuide = catchAsync(async function (req, res, next) {
   const findQuery = User.find({ role: "guide" }).select("-password");
-  const guideData = await FilterAndPaginate(findQuery, req, "fullName", 3);
+  const guideData = await FilterAndPaginate(
+    findQuery,
+    req,
+    "fullName",
+    3,
+    next,
+    "Guides"
+  );
 
   res.status(200).json({
     status: "success",

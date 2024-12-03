@@ -6,13 +6,16 @@
  * @param {number} query limit for data count
  */
 
+const AppError = require("./AppError");
 const ApplyFilter = require("./ApplyFilter");
 
 const FilterAndPaginate = async function (
   findQuery,
   request,
   searchField,
-  limit = 12
+  limit = 12,
+  next,
+  resourceName = "data"
 ) {
   const userQuery = request.query;
   const dataQuery = findQuery;
@@ -35,6 +38,7 @@ const FilterAndPaginate = async function (
   };
 
   const dataList = await filteredQuery.page(limit).dataQuery;
+  if (!dataList) return next(new AppError(`No ${resourceName} found`, 404));
 
   // return pagination object and allResource
   return {

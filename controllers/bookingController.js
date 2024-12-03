@@ -21,7 +21,14 @@ exports.getAllBookings = catchAsync(async function (req, res, next) {
       select: "fullName profileImage price userName",
     });
 
-  const mainData = await FilterAndPaginate(findQuery, req, "price", 12);
+  const mainData = await FilterAndPaginate(
+    findQuery,
+    req,
+    "price",
+    12,
+    next,
+    "Bookings"
+  );
 
   res.status(200).json({
     status: "success",
@@ -30,6 +37,24 @@ exports.getAllBookings = catchAsync(async function (req, res, next) {
     data: {
       total: mainData.dataList.length,
       tour: mainData.dataList,
+    },
+  });
+});
+
+exports.getPaymentSession = catchAsync(async function (req, res, next) {
+  const sessionId = req.params.sessionId;
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+  const data = {
+    price: session.amount_total / 100,
+    name: session.customer_details.name,
+    paymentStatus: session.payment_status,
+  };
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      paymentInfo: data,
     },
   });
 });
@@ -54,7 +79,7 @@ exports.getCheckoutSession = catchAsync(async function (req, res, next) {
       name: selectedGuide?.fullName,
       image: selectedGuide?.profileImage,
       price: selectedGuide?.price,
-      description: "Guides Fee",
+      description: "Guide Fee",
     },
   ];
 
@@ -76,7 +101,7 @@ exports.getCheckoutSession = catchAsync(async function (req, res, next) {
     payment_method_types: ["card"],
     line_items: lineItems,
     mode: "payment",
-    success_url: `${process.env.CLIENT_URL}`,
+    success_url: `${process.env.CLIENT_URL}/order-success/{CHECKOUT_SESSION_ID}`,
     cancel_url: `${req.protocol}://${req.get("host")}/tour/${product[0]?.tourId}`,
     metadata: {
       guide_id: selectedGuide.id,
@@ -180,25 +205,4 @@ exports.getEventResponse = catchAsync(async function (request, response, next) {
 
   // Return a 200 response to acknowledge receipt of the event
   response.send();
-});
-
-exports.createBooking = catchAsync(async function (req, res, next) {
-  const { user, tour, price } = req.query;
-  console.log(req.params);
-  if (!user || !tour || !price)
-    return next(
-      new AppError("Must provide tour price and user in params", 400)
-    );
-  const booking = await Booking.create({ tour, user, price });
-
-  if (!booking) return next(new AppError("No booking created", 400));
-  res.redirect(req.originalUrl.split("?")[0]);
-
-  // res.status(201).json({
-  //   success: "success",
-  //   message: "Successfully booked a tour",
-  //   data: {
-  //     booking,
-  //   },
-  // });
 });
