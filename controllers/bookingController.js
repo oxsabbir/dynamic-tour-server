@@ -3,7 +3,10 @@ const Booking = require("../models/Booking");
 const Tour = require("../models/Tour");
 const User = require("../models/User");
 const AppError = require("../utils/AppError");
+const FilterAndPaginate = require("../utils/FilterAndPaginate");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
+
+exports.getAllBookings = catchAsync(async function (req, res, next) {});
 
 exports.getCheckoutSession = catchAsync(async function (req, res, next) {
   const { tourId, guideId, startDate } = req.params;
@@ -42,10 +45,6 @@ exports.getCheckoutSession = catchAsync(async function (req, res, next) {
     },
     quantity: 1,
   }));
-
-  // ${req.protocol}://${req.get("host")}/api/v1/booking?tour=${product[0]?.tourId}&user=${
-  //     req.user.id
-  //   }&price=${product[0]?.price}
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],

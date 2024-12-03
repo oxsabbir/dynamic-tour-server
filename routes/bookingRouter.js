@@ -3,6 +3,8 @@ const authController = require("../controllers/authController");
 const bookingController = require("../controllers/bookingController");
 const router = express.Router();
 
+router.get("/", bookingController.getAllBookings);
+
 router.get(
   "/create-checkout-session/:tourId/:guideId/:startDate",
   authController.routeProtect,

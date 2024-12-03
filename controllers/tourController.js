@@ -3,37 +3,41 @@ const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
 const { upload, uploadCloudinary } = require("../utils/uploadFiles");
 const ApplyFilter = require("../utils/ApplyFilter");
+
+const FilterAndPaginate = require("../utils/FilterAndPaginate");
+
 // to work with env variable
 
 exports.getAllTours = catchAsync(async function (req, res, next) {
-  const userQuery = req.query;
-  const dataQuery = Tour.find();
+  // const userQuery = req.query;
+  // const dataQuery = Tour.find();
 
-  const filteredQuery = new ApplyFilter(userQuery, dataQuery)
-    .query("title")
-    .filter()
-    .sort()
-    .limitField();
+  // const filteredQuery = new ApplyFilter(userQuery, dataQuery)
+  //   .query("title")
+  //   .filter()
+  //   .sort()
+  //   .limitField();
 
-  const totalItem = await filteredQuery.dataQuery.clone().countDocuments();
+  // const totalItem = await filteredQuery.dataQuery.clone().countDocuments();
 
-  const totalPage = totalItem / (req.query?.limit ? +req.query?.limit : 12);
+  // const totalPage = totalItem / (req.query?.limit ? +req.query?.limit : 12);
 
-  const pagination = {
-    currentPage: +req.query?.page || 1,
-    totalItem,
-    totalPage: Math.ceil(totalPage),
-  };
+  // const pagination = {
+  //   currentPage: +req.query?.page || 1,
+  //   totalItem,
+  //   totalPage: Math.ceil(totalPage),
+  // };
 
-  const allTour = await filteredQuery.page().dataQuery;
+  // const allTour = await filteredQuery.page().dataQuery;
+  const mainData = await FilterAndPaginate(Tour, req, "title", 12);
 
   res.status(200).json({
     status: "success",
     message: "Tour retrive successfully",
-    pagination,
+    pagination: mainData.pagination,
     data: {
-      total: allTour.length,
-      tour: allTour,
+      total: mainData.dataList.length,
+      tour: mainData.dataList,
     },
   });
 });
