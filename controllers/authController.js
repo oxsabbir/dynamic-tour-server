@@ -219,6 +219,7 @@ exports.updateProfile = catchAsync(async function (req, res, next) {
     "isActive",
     "password",
     "createdAt",
+    "readyForGuide",
     "passwordChangedAt"
   );
 
@@ -239,7 +240,7 @@ exports.updateProfile = catchAsync(async function (req, res, next) {
 
   const userData = await User.findByIdAndUpdate(req.user?.id, updatedData, {
     new: true,
-  }).select("-password -role -isActive");
+  }).select("-password -role");
 
   if (!userData)
     return next(

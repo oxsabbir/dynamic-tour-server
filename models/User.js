@@ -48,12 +48,12 @@ const userSchema = new mongoose.Schema(
       type: Date,
       select: false,
     },
-    booking: [
-      {
-        type: mongoose.SchemaTypes.ObjectId,
-        ref: "Booking",
-      },
-    ],
+    // booking: [
+    //   {
+    //     type: mongoose.SchemaTypes.ObjectId,
+    //     ref: "Booking",
+    //   },
+    // ],
     confirmPassword: {
       type: String,
       // require: [true, "Please confirm the password"],
@@ -69,12 +69,12 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    completedTour: [
-      {
-        type: mongoose.SchemaTypes.ObjectId,
-        ref: "Tour",
-      },
-    ],
+    // completedTour: [
+    //   {
+    //     type: mongoose.SchemaTypes.ObjectId,
+    //     ref: "Tour",
+    //   },
+    // ],
 
     ratingAverage: Number,
     reviews: [
