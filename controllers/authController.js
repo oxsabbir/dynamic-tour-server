@@ -336,7 +336,8 @@ exports.signInWithGoogle = catchAsync(async function (req, res, next) {
   const generateUserName = async function (firstName) {
     // username should start with the firstname
     const randomNumber = Math.floor(Math.random() * (10000 - 10 + 1)) + 10;
-    const uniqueUserName = `${firstName}${randomNumber.toString()}`;
+    const uniqueUserName =
+      `${firstName}${randomNumber.toString()}`.toLowerCase();
     const userExist = await User.findOne({ userName: uniqueUserName });
 
     // if user found with the generated userName
@@ -346,6 +347,7 @@ exports.signInWithGoogle = catchAsync(async function (req, res, next) {
       console.log("non-recursive");
     }
     // check if already username exist or not
+    return uniqueUserName;
   };
 
   const createGoogleUser = async function (userInfo) {

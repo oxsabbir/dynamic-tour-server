@@ -16,12 +16,15 @@ exports.getAllUser = catchAsync(async function (req, res, next) {
 
 exports.getUserByUserName = catchAsync(async function (req, res, next) {
   let userName = req.params?.userName;
+
   if (!userName) return next(new AppError("No username found", 404));
 
   const user = await User.findOne({ userName }).select(
     "-password -__v -createdAt -email "
   );
+
   if (!user) return next(new AppError("No user found", 404));
+
   res.status(200).json({
     status: "success",
     message: "User data retrive successfully",

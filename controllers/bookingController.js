@@ -181,6 +181,7 @@ exports.getEventResponse = catchAsync(async function (request, response, next) {
   };
 
   const sig = request.headers["stripe-signature"];
+  console.log(sig, "-----------signature");
   let event;
   console.log(
     stripe.webhooks.constructEvent(request.body, sig, endpointSecret)
