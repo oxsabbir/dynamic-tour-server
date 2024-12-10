@@ -5,6 +5,8 @@ const router = express.Router();
 router.get("/", bookingController.getAllBookings);
 
 router.get("/retrive-session/:sessionId", bookingController.getPaymentSession);
+
+router.get("/booking-by-user/:userName", bookingController.getUserBookingCount);
 router.get(
   "/booking-by-user/:userName/:filterValue",
   bookingController.getUserBooking

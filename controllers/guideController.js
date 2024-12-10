@@ -11,7 +11,7 @@ exports.getAllGuide = catchAsync(async function (req, res, next) {
     findQuery,
     req,
     "fullName",
-    3,
+    9,
     next,
     "Guides"
   );
@@ -83,15 +83,27 @@ exports.becomeGuide = catchAsync(async function (req, res, next) {
 });
 
 exports.getPendingGuide = catchAsync(async function (req, res, next) {
-  const pendingGuide = await User.find({ readyForGuide: true }).select(
-    "-password"
+  const findQuery = User.find({
+    readyForGuide: true,
+    role: { $ne: "guide" },
+  }).select("-password");
+
+  const guideData = await FilterAndPaginate(
+    findQuery,
+    req,
+    "fullName",
+    9,
+    next,
+    "Guides"
   );
-  if (!pendingGuide) return next(new AppError("No pending guide found", 404));
+  if (!guideData) return next(new AppError("No pending guide found", 404));
+
   res.status(200).json({
     status: "success",
-    total: pendingGuide.length,
+    pagination: guideData.pagination,
     data: {
-      guide: pendingGuide,
+      total: guideData.dataList.length,
+      guide: guideData.dataList,
     },
   });
 });

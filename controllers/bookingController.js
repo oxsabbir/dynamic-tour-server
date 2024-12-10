@@ -29,10 +29,37 @@ exports.getAllBookings = catchAsync(async function (req, res, next) {
   });
 });
 
+exports.getUserBookingCount = catchAsync(async function (req, res, next) {
+  const userName = req.params.userName;
+  if (!userName) return next(new AppError("username not found", 404));
+
+  const userId = await User.findOne({ userName: userName }).select("_id");
+
+  const date = new Date();
+  const completed = await Booking.find({
+    user: userId.id,
+    startDate: { $lt: date },
+  }).countDocuments();
+  const upcoming = await Booking.find({
+    user: userId.id,
+    startDate: { $gt: date },
+  }).countDocuments();
+
+  res.status(200).json({
+    status: "success",
+    message: "Bookings count retrive successfully",
+    data: {
+      upcoming: upcoming,
+      completed: completed,
+    },
+  });
+});
+
 exports.getUserBooking = catchAsync(async function (req, res, next) {
   const userName = req.params.userName;
-  const filterValue = req.params.filterValue;
-  if (!filterValue || !userName)
+  const filterValue = req.params?.filterValue;
+
+  if (!userName && !filterValue)
     return next(new AppError("Username or filtervalue not found", 404));
 
   const userId = await User.findOne({ userName: userName }).select("_id");
@@ -40,7 +67,6 @@ exports.getUserBooking = catchAsync(async function (req, res, next) {
   // upcoming means startDate < currentDate
   // review means startDate > currentDate || not reviewed
   //
-
   const date = new Date();
   let filterObject;
 
