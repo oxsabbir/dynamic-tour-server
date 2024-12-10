@@ -110,18 +110,19 @@ exports.getPendingGuide = catchAsync(async function (req, res, next) {
 
 exports.acceptGuide = catchAsync(async function (req, res, next) {
   // the id of the guide to accept coming from params
+  console.log("hi");
   const guideId = req.params?.id;
   if (!guideId) return next(new AppError("No guide id found", 404));
   const acceptedGuide = await User.findOneAndUpdate(
     { _id: guideId, readyForGuide: true, role: { $ne: "guide" } },
-    {
-      role: "guide",
-    },
+    { role: "guide" },
     { new: true }
   ).select("-password");
 
   if (!acceptedGuide)
     return next(new AppError("No guide found to accept", 404));
+
+  console.log(acceptedGuide);
 
   res.status(200).json({
     status: "success",

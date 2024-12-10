@@ -18,13 +18,13 @@ router.get(
   guideController.getPendingGuide
 );
 
-router.post(
+router.get(
   "/accept/:id",
   authController.routeProtect,
   authController.authorise("admin"),
   guideController.acceptGuide
 );
-router.post(
+router.get(
   "/reject/:id",
   authController.routeProtect,
   authController.authorise("admin"),
