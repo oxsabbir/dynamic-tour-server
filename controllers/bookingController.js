@@ -13,7 +13,7 @@ exports.getAllBookings = catchAsync(async function (req, res, next) {
     findQuery,
     req,
     "price",
-    12,
+    9,
     next,
     "Bookings"
   );

@@ -21,6 +21,12 @@ const bookingSchema = new mongoose.Schema(
       type: Date,
       require: [true, "A booking must have a data"],
     },
+    isComplete: {
+      type: Boolean,
+      default: function () {
+        return new Date(this.startDate) < new Date();
+      },
+    },
     price: {
       type: Number,
       require: [true, "A booking must have a price"],
