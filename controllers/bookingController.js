@@ -66,15 +66,17 @@ exports.getUserBookingCount = catchAsync(async function (req, res, next) {
   const userName = req.params.userName;
   if (!userName) return next(new AppError("username not found", 404));
 
-  const userId = await User.findOne({ userName: userName }).select("_id");
+  const user = await User.findOne({ userName: userName }).select("_id role");
+
+  let fieldToSearch = user.role === "guide" ? "guide" : "user";
 
   const date = new Date();
   const completed = await Booking.find({
-    user: userId.id,
+    [fieldToSearch]: user.id,
     startDate: { $lt: date },
   }).countDocuments();
   const upcoming = await Booking.find({
-    user: userId.id,
+    [fieldToSearch]: user.id,
     startDate: { $gt: date },
   }).countDocuments();
 
