@@ -23,7 +23,7 @@ exports.getAllBookings = catchAsync(async function (req, res, next) {
       {
         $match: {
           "userDetails.fullName": {
-            $regex: `^${req.query.query}`, // Matches titles starting with the prefix
+            $regex: `^${req.query.query?.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") || req.query.query}`, // Matches titles starting with the prefix
             $options: "i", // Case-insensitive matching
           },
         },
