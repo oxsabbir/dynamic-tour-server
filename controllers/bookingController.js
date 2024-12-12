@@ -7,7 +7,40 @@ const FilterAndPaginate = require("../utils/FilterAndPaginate");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 exports.getAllBookings = catchAsync(async function (req, res, next) {
-  const findQuery = Booking.find();
+  let findQuery = Booking.find();
+
+  if (req.query.query) {
+    const searchedData = await Booking.aggregate([
+      {
+        $lookup: {
+          from: "users", // The collection name of the `Tour` model
+          localField: "user",
+          foreignField: "_id",
+          as: "userDetails",
+        },
+      },
+      { $unwind: "$userDetails" }, // Unwind the array created by `$lookup`
+      {
+        $match: {
+          "userDetails.fullName": {
+            $regex: `^${req.query.query}`, // Matches titles starting with the prefix
+            $options: "i", // Case-insensitive matching
+          },
+        },
+      }, // Match the title
+      {
+        $project: {
+          userDetails: 0, // Exclude the tourDetails from the output if not needed
+        },
+      },
+    ]);
+    // getting all the id from the aggregation
+    const bookingIds = searchedData.map((item) => item._id);
+
+    findQuery = Booking.find({ _id: { $in: bookingIds } });
+
+    req.query.query = undefined;
+  }
 
   const mainData = await FilterAndPaginate(
     findQuery,

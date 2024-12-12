@@ -7,7 +7,7 @@ class ApplyFilter {
   filter() {
     const queryObj = { ...this.userQuery };
 
-    const optField = ["page", "limit", "sort", "field", "query"];
+    const optField = ["page", "limit", "sort", "field", "query", "custom"];
     // deleted the unwanted field for the method downbelow
 
     optField.forEach((item) => delete queryObj[item]);
@@ -23,6 +23,7 @@ class ApplyFilter {
     if (this.userQuery.query) {
       const searchQuery = this.userQuery?.query;
       let escapedQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
       this.dataQuery.find({
         [pathName]: { $regex: escapedQuery, $options: "i" },
       });
