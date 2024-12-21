@@ -9,6 +9,8 @@ const tourRouter = require("./routes/tourRouter");
 const reviewRouter = require("./routes/reviewRouter");
 const guideRouter = require("./routes/guideRouter");
 const bookingRouter = require("./routes/bookingRouter");
+const statsRouter = require("./routes/statsRouter");
+
 const webhookMethod =
   require("./controllers/bookingController").getEventResponse;
 
@@ -39,6 +41,7 @@ app.use("/api/v1/guide", guideRouter);
 app.use("/api/v1/tour", tourRouter);
 app.use("/api/v1/review", reviewRouter);
 app.use("/api/v1/booking", bookingRouter);
+app.use("/api/v1/statistic", statsRouter);
 
 // sending response for undefined route
 app.all("*", (req, res, next) => {
