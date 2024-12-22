@@ -5,6 +5,19 @@ const Booking = require("../models/Booking");
 exports.getSalesStats = catchAsync(async function (req, res, next) {
   const filterType = req.query?.filter || "month";
 
+  if (
+    req.query?.filter !== "today" &&
+    req.query?.filter !== "week" &&
+    req.query?.filter !== "month" &&
+    req.query?.filter !== "year"
+  )
+    return next(
+      new AppError(
+        "Please provide correct filterType, e.g. today,week,month,year",
+        403
+      )
+    );
+
   const dayCount = {
     today: 0,
     week: 7,
@@ -30,6 +43,8 @@ exports.getSalesStats = catchAsync(async function (req, res, next) {
       },
     },
   ]);
+
+  console.log(boookingSales);
 
   res.status(200).json({
     status: "success",
