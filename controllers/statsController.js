@@ -5,6 +5,17 @@ const Booking = require("../models/Booking");
 exports.getSalesStats = catchAsync(async function (req, res, next) {
   const filterType = req.query?.filter || "month";
 
+  const boookingSales = await Booking.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalSells: { $sum: "$price" },
+        averageSells: { $avg: "$price" },
+        totalBookings: { $sum: 1 },
+      },
+    },
+  ]);
+
   res.status(200).json({
     status: "success",
     filter: filterType,
