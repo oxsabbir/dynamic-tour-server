@@ -30,31 +30,55 @@ exports.getSalesStats = catchAsync(async function (req, res, next) {
 
   const dayInMillS = day * 24 * 60 * 60 * 1000;
 
-  let filterDate = null;
+  let filterDate = { current: null, previous: null };
   if (filterType !== null) {
-    filterDate = new Date(Date.now() - dayInMillS).toISOString();
+    filterDate.current = new Date(Date.now() - dayInMillS).toISOString();
+    filterDate.previous = new Date(Date.now() - dayInMillS * 2).toISOString();
   }
 
   console.log(
-    `from = ${new Date(filterDate)} to = ${new Date().toISOString()}`
+    `from = ${new Date(filterDate.current)} to = ${new Date().toISOString()}`
   );
-  console.log(new Date(filterDate));
 
   const [boookingSales] = await Booking.aggregate([
     {
-      $match: {
-        $and: [
-          { createdAt: { $gte: new Date(filterDate) } },
-          { createdAt: { $lte: new Date() } },
+      $facet: {
+        previous: [
+          {
+            $match: {
+              $and: [
+                { createdAt: { $gte: new Date(filterDate.previous) } },
+                { createdAt: { $lte: new Date(filterDate.current) } },
+              ],
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              totalSells: { $sum: "$price" },
+              averageSells: { $avg: "$price" },
+              totalBookings: { $sum: 1 },
+            },
+          },
         ],
-      },
-    },
-    {
-      $group: {
-        _id: null,
-        totalSells: { $sum: "$price" },
-        averageSells: { $avg: "$price" },
-        totalBookings: { $sum: 1 },
+        current: [
+          {
+            $match: {
+              $and: [
+                { createdAt: { $gte: new Date(filterDate.current) } },
+                { createdAt: { $lte: new Date() } },
+              ],
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              totalSells: { $sum: "$price" },
+              averageSells: { $avg: "$price" },
+              totalBookings: { $sum: 1 },
+            },
+          },
+        ],
       },
     },
   ]);
