@@ -80,14 +80,48 @@ exports.getSalesStats = catchAsync(async function (req, res, next) {
   ]);
 
   const getParcentangeChanges = function (previousSales, currentSales) {
-    console.log(previousSales, currentSales, "hi---------");
-    // main login goes here
+    // formula to count parcentage
+    // ((current - previous) / previous) * 100
 
     const changesRate = {
-      totalSells: { changes: "positive", amount: 0 },
-      averageSells: { changes: "positive", amount: 0 },
-      totalBookings: { changes: "positive", amount: 0 },
+      totalSells: { increased: false, amount: 0 },
+      averageSells: { increased: false, amount: 0 },
+      totalBookings: { increased: false, amount: 0 },
     };
+
+    // calculation
+    changesRate.totalSells.amount =
+      ((currentSales.totalSells - previousSales.totalSells) /
+        previousSales.totalSells) *
+      100;
+    changesRate.totalSells.amount === Infinity
+      ? (changesRate.totalSells.amount = "Infinity")
+      : "";
+    changesRate.totalSells.amount > 0
+      ? (changesRate.totalSells.increased = true)
+      : (changesRate.totalSells.increased = false);
+
+    changesRate.averageSells.amount =
+      ((currentSales.averageSells - previousSales.averageSells) /
+        previousSales.averageSells) *
+      100;
+    changesRate.averageSells.amount === Infinity
+      ? (changesRate.averageSells.amount = "Infinity")
+      : "";
+    changesRate.averageSells.amount > 0
+      ? (changesRate.averageSells.increased = true)
+      : (changesRate.averageSells.increased = false);
+
+    changesRate.totalBookings.amount =
+      ((currentSales.totalBookings - previousSales.totalBookings) /
+        previousSales.totalBookings) *
+      100;
+    changesRate.totalBookings.amount === Infinity
+      ? (changesRate.totalBookings.amount = "Infinity")
+      : "";
+    changesRate.totalBookings.amount > 0
+      ? (changesRate.totalBookings.increased = true)
+      : (changesRate.totalBookings.increased = false);
 
     return changesRate;
   };
@@ -104,7 +138,10 @@ exports.getSalesStats = catchAsync(async function (req, res, next) {
     boookingSales?.current.length > 0 ? boookingSales?.current[0] : dataField;
 
   // getting the changes
-  getParcentangeChanges(previousSalesData, currentSalesData);
+  const changesParcentage = getParcentangeChanges(
+    previousSalesData,
+    currentSalesData
+  );
 
   res.status(200).json({
     status: "success",
@@ -112,19 +149,16 @@ exports.getSalesStats = catchAsync(async function (req, res, next) {
 
     data: {
       totalSells: {
-        amount: boookingSales?.totalSells || 0,
-        rate: 23,
-        increased: false,
+        amount: +boookingSales?.current[0]?.totalSells?.toFixed(2) || 0,
+        changes: changesParcentage.totalSells,
       },
       averageSells: {
-        amount: boookingSales?.averageSells || 0,
-        rate: 120,
-        increased: true,
+        amount: +boookingSales?.current[0]?.averageSells?.toFixed(2) || 0,
+        changes: changesParcentage.averageSells,
       },
       totalBookings: {
-        amount: boookingSales?.totalBookings || 0,
-        rate: 5,
-        increased: true,
+        amount: +boookingSales?.current[0]?.totalBookings?.toFixed(2) || 0,
+        changes: changesParcentage.totalBookings,
       },
     },
   });
