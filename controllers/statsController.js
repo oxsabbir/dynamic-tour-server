@@ -35,10 +35,18 @@ exports.getSalesStats = catchAsync(async function (req, res, next) {
     filterDate = new Date(Date.now() - dayInMillS).toISOString();
   }
 
+  console.log(
+    `from = ${new Date(filterDate)} to = ${new Date().toISOString()}`
+  );
+  console.log(new Date(filterDate));
+
   const [boookingSales] = await Booking.aggregate([
     {
       $match: {
-        createdAt: filterDate ? { $gt: new Date(filterDate) } : { $ne: false },
+        $and: [
+          { createdAt: { $gte: new Date(filterDate) } },
+          { createdAt: { $lte: new Date() } },
+        ],
       },
     },
     {
@@ -50,8 +58,6 @@ exports.getSalesStats = catchAsync(async function (req, res, next) {
       },
     },
   ]);
-
-  // trying in the past
 
   res.status(200).json({
     status: "success",
