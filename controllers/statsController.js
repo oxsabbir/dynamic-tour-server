@@ -36,10 +36,6 @@ exports.getSalesStats = catchAsync(async function (req, res, next) {
     filterDate.previous = new Date(Date.now() - dayInMillS * 2).toISOString();
   }
 
-  console.log(
-    `from = ${new Date(filterDate.current)} to = ${new Date().toISOString()}`
-  );
-
   const [boookingSales] = await Booking.aggregate([
     {
       $facet: {
@@ -82,6 +78,33 @@ exports.getSalesStats = catchAsync(async function (req, res, next) {
       },
     },
   ]);
+
+  const getParcentangeChanges = function (previousSales, currentSales) {
+    console.log(previousSales, currentSales, "hi---------");
+    // main login goes here
+
+    const changesRate = {
+      totalSells: { changes: "positive", amount: 0 },
+      averageSells: { changes: "positive", amount: 0 },
+      totalBookings: { changes: "positive", amount: 0 },
+    };
+
+    return changesRate;
+  };
+
+  const dataField = {
+    totalSells: 0,
+    averageSells: 0,
+    totalBookings: 0,
+  };
+
+  const previousSalesData =
+    boookingSales?.previous.length > 0 ? boookingSales?.previous[0] : dataField;
+  const currentSalesData =
+    boookingSales?.current.length > 0 ? boookingSales?.current[0] : dataField;
+
+  // getting the changes
+  getParcentangeChanges(previousSalesData, currentSalesData);
 
   res.status(200).json({
     status: "success",
