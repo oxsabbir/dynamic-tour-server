@@ -1,6 +1,7 @@
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/AppError");
 const Booking = require("../models/Booking");
+const Tour = require("../models/Tour");
 
 exports.getSalesStats = catchAsync(async function (req, res, next) {
   const filterType = req.query?.filter || null;
@@ -160,6 +161,56 @@ exports.getSalesStats = catchAsync(async function (req, res, next) {
         amount: +boookingSales?.current[0]?.totalBookings?.toFixed(2) || 0,
         changes: changesParcentage.totalBookings,
       },
+    },
+  });
+});
+
+exports.getLoyaleGuides = catchAsync(async function (req, res, next) {
+  // get the top 9 guides who completed the most amount of tours
+  const loyaleGuide = await Booking.aggregate([
+    {
+      $match: {
+        startDate: { $lt: new Date() },
+      },
+    },
+    {
+      $group: {
+        _id: "$guide",
+        completed: { $sum: 1 },
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        foreignField: "_id",
+        localField: "_id",
+        as: "info",
+        pipeline: [
+          {
+            $project: {
+              _id: 0,
+              password: 0,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+      },
+    },
+    {
+      $limit: 9,
+    },
+  ]);
+
+  console.log(loyaleGuide);
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      guide: loyaleGuide,
     },
   });
 });
