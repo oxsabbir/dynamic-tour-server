@@ -205,8 +205,6 @@ exports.getLoyaleGuides = catchAsync(async function (req, res, next) {
     },
   ]);
 
-  console.log(loyaleGuide);
-
   res.status(200).json({
     status: "success",
     data: {

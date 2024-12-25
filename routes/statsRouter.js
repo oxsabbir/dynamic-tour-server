@@ -7,12 +7,13 @@ const router = express.Router();
 router.get(
   "/sales",
   authController.routeProtect,
-  authController.authorise,
+  authController.authorise("admin"),
   statsController.getSalesStats
 );
 router.get(
   "/loyaleGuides",
   authController.routeProtect,
+  authController.authorise("admin"),
   statsController.getLoyaleGuides
 );
 

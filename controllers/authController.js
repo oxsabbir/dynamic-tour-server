@@ -171,6 +171,7 @@ exports.routeProtect = catchAsync(async function (req, res, next) {
   req.user = user;
   req.userRole = user.role;
   // send response
+
   next();
 });
 
