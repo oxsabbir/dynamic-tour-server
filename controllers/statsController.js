@@ -217,3 +217,12 @@ exports.getLoyaleGuides = catchAsync(async function (req, res, next) {
     },
   });
 });
+
+exports.getDailySell = catchAsync(async function (req, res, next) {
+  res.status(200).json({
+    status: "success",
+    data: {
+      hi: "hi",
+    },
+  });
+});

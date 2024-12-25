@@ -17,4 +17,11 @@ router.get(
   statsController.getLoyaleGuides
 );
 
+router.get(
+  "/dailySells",
+  authController.routeProtect,
+  authController.authorise("admin"),
+  statsController.getDailySell
+);
+
 module.exports = router;
