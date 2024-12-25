@@ -201,6 +201,11 @@ exports.getLoyaleGuides = catchAsync(async function (req, res, next) {
       },
     },
     {
+      $sort: {
+        completed: -1,
+      },
+    },
+    {
       $limit: 9,
     },
   ]);
