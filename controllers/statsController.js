@@ -1,7 +1,7 @@
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/AppError");
 const Booking = require("../models/Booking");
-const Tour = require("../models/Tour");
+const { monthList } = require("../utils/constant");
 
 exports.getSalesStats = catchAsync(async function (req, res, next) {
   const filterType = req.query?.filter || null;
@@ -259,6 +259,24 @@ exports.getDailySell = catchAsync(async function (req, res, next) {
   ]);
 
   console.log(dailySells);
+  const generatedData = monthList.map((month) => {
+    const foundData = dailySells.find((item) => month === item._id);
+    if (foundData) {
+      return {
+        month: foundData._id,
+        totalBookings: foundData.totalBookings,
+        totalSells: foundData.totalSells,
+      };
+    } else {
+      return {
+        month,
+        totalBookings: 0,
+        totalSells: 0,
+      };
+    }
+  });
+
+  console.log(generatedData);
 
   res.status(200).json({
     status: "success",
