@@ -18,10 +18,10 @@ router.get(
 );
 
 router.get(
-  "/dailySells",
+  "/salesOverview",
   authController.routeProtect,
   authController.authorise("admin"),
-  statsController.getDailySell
+  statsController.getSalesOverView
 );
 
 module.exports = router;
