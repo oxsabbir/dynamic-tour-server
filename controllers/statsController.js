@@ -219,6 +219,47 @@ exports.getLoyaleGuides = catchAsync(async function (req, res, next) {
 });
 
 exports.getDailySell = catchAsync(async function (req, res, next) {
+  // need total sell in a month for last 12 month
+  const dayInMillS = 365 * 24 * 60 * 60 * 1000;
+  const dateLastYear = new Date(Date.now() - dayInMillS);
+  // data and bookings that day
+  const dailySells = await Booking.aggregate([
+    {
+      $match: {
+        $and: [
+          { createdAt: { $gte: dateLastYear } },
+          { createdAt: { $lte: new Date(Date.now()) } },
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: "$createdAt",
+        totalBookings: { $sum: 1 },
+        totalSells: { $sum: "$price" },
+      },
+    },
+    {
+      $addFields: {
+        month: {
+          $dateToString: {
+            format: "%B",
+            date: "$_id",
+          },
+        },
+      },
+    },
+    {
+      $group: {
+        _id: "$month",
+        totalBookings: { $sum: "$totalBookings" },
+        totalSells: { $sum: "$totalSells" },
+      },
+    },
+  ]);
+
+  console.log(dailySells);
+
   res.status(200).json({
     status: "success",
     data: {
