@@ -262,15 +262,17 @@ exports.getSalesOverView = catchAsync(async function (req, res, next) {
     const foundData = salesOverview.find((item) => month === item._id);
     if (foundData) {
       return {
-        month: foundData._id,
-        totalBookings: foundData.totalBookings,
-        totalSells: foundData.totalSells,
+        month: foundData._id.slice(0, 3).toUpperCase(),
+        monthFull: foundData._id,
+        TOTALBOOKING: foundData.totalBookings,
+        TOTALSELLS: foundData.totalSells,
       };
     } else {
       return {
-        month,
-        totalBookings: 0,
-        totalSells: 0,
+        month: month.slice(0, 3).toUpperCase(),
+        monthFull: month,
+        TOTALBOOKING: 0,
+        TOTALSELLS: 0,
       };
     }
   });
