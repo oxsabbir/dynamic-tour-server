@@ -284,3 +284,13 @@ exports.getSalesOverView = catchAsync(async function (req, res, next) {
     },
   });
 });
+
+exports.getUserJoinStats = catchAsync(async function (req, res, next) {
+  // get user joined date on month
+  res.status(200).json({
+    status: "success",
+    data: {
+      joinStats: 5,
+    },
+  });
+});
