@@ -1,6 +1,7 @@
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/AppError");
 const Booking = require("../models/Booking");
+const User = require("../models/User");
 const { monthList } = require("../utils/constant");
 
 exports.getSalesStats = catchAsync(async function (req, res, next) {
@@ -287,6 +288,22 @@ exports.getSalesOverView = catchAsync(async function (req, res, next) {
 
 exports.getUserJoinStats = catchAsync(async function (req, res, next) {
   // get user joined date on month
+  const dayInMillS = 365 * 24 * 60 * 60 * 1000;
+  const dateLastYear = new Date(Date.now() - dayInMillS);
+  // data and bookings that day
+  const userJoinData = await User.aggregate([
+    {
+      $match: {
+        $and: [
+          { createdAt: { $gte: dateLastYear } },
+          { createdAt: { $lte: new Date(Date.now()) } },
+        ],
+      },
+    },
+  ]);
+
+  console.log(userJoinData);
+
   res.status(200).json({
     status: "success",
     data: {
