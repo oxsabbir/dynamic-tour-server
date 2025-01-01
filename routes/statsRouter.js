@@ -9,5 +9,6 @@ router.get("/sales", statsController.getSalesStats);
 router.get("/loyaleGuides", statsController.getLoyaleGuides);
 router.get("/salesOverview", statsController.getSalesOverView);
 router.get("/userJoinStats", statsController.getUserJoinStats);
+router.get("/userActionRatio", statsController.getUserActionRatio);
 
 module.exports = router;

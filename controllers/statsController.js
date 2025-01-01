@@ -355,3 +355,16 @@ exports.getUserJoinStats = catchAsync(async function (req, res, next) {
     },
   });
 });
+
+exports.getUserActionRatio = catchAsync(async function (req, res, next) {
+  // get join user pacentage
+  // how many of them reviews
+  // how many of them booked
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      userActionRatio: 5,
+    },
+  });
+});
