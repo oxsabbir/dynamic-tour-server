@@ -300,6 +300,35 @@ exports.getUserJoinStats = catchAsync(async function (req, res, next) {
         ],
       },
     },
+
+    {
+      $group: {
+        _id: "$createdAt",
+        totalCreated: { $sum: 1 },
+      },
+    },
+
+    {
+      $addFields: {
+        month: {
+          $dateToString: {
+            format: "%B",
+            date: "$_id",
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+      },
+    },
+    {
+      $group: {
+        _id: "$month",
+        totalCreated: { $sum: 1 },
+      },
+    },
   ]);
 
   console.log(userJoinData);
