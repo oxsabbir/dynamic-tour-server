@@ -331,12 +331,27 @@ exports.getUserJoinStats = catchAsync(async function (req, res, next) {
     },
   ]);
 
-  console.log(userJoinData);
+  const generatedUserData = monthList.map((month) => {
+    const foundData = userJoinData.find((item) => month === item._id);
+    if (foundData) {
+      return {
+        month: foundData._id.slice(0, 3).toUpperCase(),
+        monthFull: foundData._id,
+        TOTALJOIN: foundData.totalCreated,
+      };
+    } else {
+      return {
+        month: month.slice(0, 3).toUpperCase(),
+        monthFull: month,
+        TOTALJOIN: 0,
+      };
+    }
+  });
 
   res.status(200).json({
     status: "success",
     data: {
-      joinStats: 5,
+      userJoinData: generatedUserData,
     },
   });
 });
