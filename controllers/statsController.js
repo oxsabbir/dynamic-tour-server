@@ -2,6 +2,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/AppError");
 const Booking = require("../models/Booking");
 const User = require("../models/User");
+const Review = require("../models/Review");
 const { monthList } = require("../utils/constant");
 
 exports.getSalesStats = catchAsync(async function (req, res, next) {
@@ -357,9 +358,18 @@ exports.getUserJoinStats = catchAsync(async function (req, res, next) {
 });
 
 exports.getUserActionRatio = catchAsync(async function (req, res, next) {
-  // get join user pacentage
-  // how many of them reviews
-  // how many of them booked
+  const totalUser = await User.find().countDocuments();
+  const userActionData = await Booking.aggregate([
+    {
+      $group: {
+        _id: "$user",
+        totalBooking: { $sum: 1 },
+      },
+    },
+    {
+      $count: "totalBookedUser",
+    },
+  ]);
 
   res.status(200).json({
     status: "success",
