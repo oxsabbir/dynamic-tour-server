@@ -371,10 +371,23 @@ exports.getUserActionRatio = catchAsync(async function (req, res, next) {
     },
   ]);
 
+  let bookedUser = {
+    amount: userActionData[0]?.totalBookedUser,
+    parcentage: (userActionData[0]?.totalBookedUser * 100) / totalUser,
+  };
+  let notBookedUser = {
+    amount: totalUser - userActionData[0]?.totalBookedUser,
+    parcentage: 100 - bookedUser?.parcentage?.toFixed(2),
+  };
+
   res.status(200).json({
     status: "success",
     data: {
-      userActionRatio: 5,
+      userBookingRatio: {
+        totalUser: totalUser,
+        bookedUser,
+        notBookedUser,
+      },
     },
   });
 });
