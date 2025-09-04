@@ -237,19 +237,15 @@ exports.getEventResponse = catchAsync(async function (request, response, next) {
       price: price,
       startDate: startDate,
     });
-
-    console.log(booking);
   };
 
   const sig = request.headers["stripe-signature"];
-  console.log(sig, "-----------signature");
+
   let event;
-  console.log(
-    stripe.webhooks.constructEvent(request.body, sig, endpointSecret)
-  );
 
   try {
     event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+    console.log(event);
   } catch (err) {
     response.status(400).send(`Webhook Error: ${err.message}`);
     return;
