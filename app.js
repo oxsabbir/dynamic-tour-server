@@ -15,6 +15,12 @@ const webhookMethod =
   require("./controllers/bookingController").getEventResponse;
 
 app.use(cors());
+
+app.post(
+  "/stripe-webhook",
+  express.raw({ type: "application/json" }),
+  webhookMethod
+);
 // getting the http body data, Body parser
 app.use(express.urlencoded({ extended: true }));
 // setting cookie parser
@@ -26,12 +32,6 @@ app.get("/", (req, res, next) => {
     message: "Server is up and running",
   });
 });
-
-app.post(
-  "/stripe-webhook",
-  express.raw({ type: "application/json" }),
-  webhookMethod
-);
 
 app.use(express.json());
 // Defining required routes
