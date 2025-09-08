@@ -241,6 +241,10 @@ exports.getEventResponse = catchAsync(async function (request, response, next) {
 
   const sig = request.headers["stripe-signature"];
 
+  console.log("raw type:", typeof request.body);
+  console.log("raw buffer length:", request.body.length);
+  console.log("first 200 chars:", request.body.toString().slice(0, 200));
+
   let event;
 
   try {
@@ -254,14 +258,11 @@ exports.getEventResponse = catchAsync(async function (request, response, next) {
   // Handle the event
   switch (event.type) {
     case "checkout.session.async_payment_failed":
-      console.log("failed");
       const checkoutSessionAsyncPaymentFailed = event.data.object;
       // Then define and call a function to handle the event checkout.session.async_payment_failed
       break;
     case "checkout.session.async_payment_succeeded":
       const checkoutSessionAsyncPaymentSucceeded = event.data.object;
-      console.log("success");
-      console.log(event.data.object);
       // Then define and call a function to handle the event checkout.session.async_payment_succeeded
       break;
     case "checkout.session.completed":
@@ -284,7 +285,6 @@ exports.getEventResponse = catchAsync(async function (request, response, next) {
 
     case "charge.updated":
       const chargeUpdated = event.data.object;
-      console.log(chargeUpdated.receipt_url);
       break;
 
     case "checkout.session.expired":

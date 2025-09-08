@@ -22,9 +22,7 @@ app.post(
   webhookMethod
 );
 // getting the http body data, Body parser
-app.use(express.json());
 
-app.use(express.urlencoded({ extended: true }));
 // setting cookie parser
 app.use(cookieParser());
 
@@ -34,7 +32,8 @@ app.get("/", (req, res, next) => {
     message: "Server is up and running",
   });
 });
-
+app.use("/api", express.json());
+app.use("/api", express.urlencoded({ extended: true }));
 // Defining required routes
 app.use("/api/v1/", authRouter);
 app.use("/api/v1/user", userRouter);
