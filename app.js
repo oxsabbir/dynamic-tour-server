@@ -10,18 +10,63 @@ const reviewRouter = require("./routes/reviewRouter");
 const guideRouter = require("./routes/guideRouter");
 const bookingRouter = require("./routes/bookingRouter");
 const statsRouter = require("./routes/statsRouter");
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
-const webhookMethod =
-  require("./controllers/bookingController").getEventResponse;
+// Capture raw body only for webhook route
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      if (req.originalUrl === "/stripe-webhook") {
+        req.rawBody = buf;
+      }
+    },
+  })
+);
+
+// Webhook route
+app.post("/stripe-webhook", async (req, res) => {
+  const sig = req.headers["stripe-signature"];
+
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.rawBody, // MUST be buffer, do NOT toString
+      sig,
+      process.env.WEB_HOOK_SECRET
+    );
+    console.log("✅ Webhook verified:", event.type);
+  } catch (err) {
+    console.log("✅ Webhook ---", err);
+    console.error("❌ Stripe webhook verification failed:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Handle your events
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    console.log("Completed session id:", session.id);
+  }
+
+  res.status(200).send({ received: true });
+});
+
+// const webhookMethod =
+//   require("./controllers/bookingController").getEventResponse;
 
 app.use(cors());
 
-app.post(
-  "/stripe-webhook",
-  express.raw({ type: "application/json" }),
-  webhookMethod
-);
-// getting the http body data, Body parser
+// app.use(
+//   express.json({
+//     verify: (req, res, buf) => {
+//       if (req.originalUrl === "/stripe-webhook") {
+//         req.rawBody = buf;
+//       }
+//     },
+//   })
+// );
+
+// app.post("/stripe-webhook", webhookMethod);
+// // getting the http body data, Body parser
 
 // setting cookie parser
 app.use(cookieParser());
@@ -32,7 +77,6 @@ app.get("/", (req, res, next) => {
     message: "Server is up and running",
   });
 });
-app.use("/api", express.json());
 app.use("/api", express.urlencoded({ extended: true }));
 // Defining required routes
 app.use("/api/v1/", authRouter);
