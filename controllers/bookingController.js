@@ -46,7 +46,7 @@ exports.getAllBookings = catchAsync(async function (req, res, next) {
     findQuery,
     req,
     "price",
-    9,
+    10,
     next,
     "Bookings"
   );
@@ -122,7 +122,7 @@ exports.getUserBooking = catchAsync(async function (req, res, next) {
     findQuery,
     req,
     "price",
-    6,
+    10,
     next,
     "Bookings"
   );
