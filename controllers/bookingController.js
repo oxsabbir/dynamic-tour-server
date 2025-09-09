@@ -241,23 +241,11 @@ exports.getEventResponse = catchAsync(async function (request, response, next) {
 
   const sig = request.headers["stripe-signature"];
 
-  console.log("-------------try--------------");
-  console.log("signature:", sig);
-  console.log("secret:", endpointSecret);
-  console.log("raw type:", request.rawBody);
-  console.log("raw buffer length:", request.rawBody?.length);
-
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(
-      request.rawBody,
-      sig,
-      endpointSecret
-    );
-    console.log(event);
+    event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
   } catch (err) {
-    console.log(err);
     response.status(400).send(`Webhook Error: ${err.message}`);
     return;
   }
