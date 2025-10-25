@@ -25,11 +25,7 @@ const DATABASE_PASSWORD = process.env.PASSWORD;
 const PORT = process.env.PORT || 4000;
 
 mongoose
-  .connect(DATABASE_URL.replace("<PASSWORD>", DATABASE_PASSWORD), {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: true,
-  })
+  .connect(DATABASE_URL.replace("<PASSWORD>", DATABASE_PASSWORD))
   .then(() => console.log("DATABASE CONNECTED SUCCESSFULLY"));
 
 // starting server
